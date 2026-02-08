@@ -8,6 +8,7 @@ export function Select({
   fullWidth = true,
   className = "",
   id,
+  children,
   ...props
 }) {
   const selectId = id || useId();
@@ -33,11 +34,13 @@ export function Select({
           `}
           {...props}
         >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {children ||
+            (options &&
+              options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              )))}
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
           <ChevronDown className="h-4 w-4" />

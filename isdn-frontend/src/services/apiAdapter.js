@@ -39,9 +39,13 @@ class ApiAdapter {
 
     const headers = {
       Accept: "application/json",
-      "Content-Type": "application/json",
       ...options.headers,
     };
+
+    // Only set Content-Type for non-FormData requests
+    if (!(options.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     // Add authorization header if token exists
     if (token) {
@@ -56,15 +60,27 @@ class ApiAdapter {
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, config);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Try to parse JSON response regardless of status code
+      const data = await response.json();
+
+      // If response is not ok and data doesn't have success property, add it
+      if (!response.ok && !data.hasOwnProperty("success")) {
+        return {
+          success: false,
+          message: data.message || `HTTP error! status: ${response.status}`,
+          data: null,
+        };
       }
 
-      const data = await response.json();
       return data;
     } catch (error) {
       console.error("API Request Error:", error);
-      throw error;
+      // Return a structured error response
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+        data: null,
+      };
     }
   }
 
@@ -85,7 +101,7 @@ class ApiAdapter {
   async post(endpoint, data, headers = {}) {
     return this.request(endpoint, {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
       headers,
     });
   }
@@ -96,7 +112,7 @@ class ApiAdapter {
   async put(endpoint, data, headers = {}) {
     return this.request(endpoint, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
       headers,
     });
   }

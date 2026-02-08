@@ -1,3 +1,4 @@
+import { Decimal } from "@prisma/client/runtime/client";
 export interface User {
     id: bigint;
     username: string;
@@ -48,7 +49,10 @@ export interface CreateUserDto {
     customerType?: string;
     assignedBranchId?: bigint;
     branchId?: bigint;
-    vehicleId?: bigint;
+    vehicleNumber?: string;
+    vehicleType?: string;
+    vehicleBrand?: string;
+    vehicleCapacity?: Decimal;
     licenseNumber?: string;
 }
 export interface UpdateUserDto {
@@ -104,4 +108,89 @@ export interface JwtPayload {
     roleId: string;
     iat?: number;
     exp?: number;
+}
+export interface Vehicle {
+    id: bigint;
+    vehicleNumber: string;
+    vehicleType: string;
+    brand: string;
+    capacityKg: Decimal;
+    branchId?: bigint | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+export interface ProductCategory {
+    id: bigint;
+    name: string;
+    description?: string | null;
+}
+export interface Product {
+    id: bigint;
+    productCode: string;
+    name: string;
+    categoryId: bigint;
+    unitPrice: Decimal;
+    unitType: string;
+    promotionId?: bigint | null;
+    description?: string | null;
+    imageUrl?: string | null;
+    active: boolean;
+    productImages?: ProductImage[];
+}
+export interface ProductImage {
+    id: bigint;
+    productId: bigint;
+    imageUrl: string;
+    createdAt: Date;
+}
+export interface CreateProductCategoryDto {
+    name: string;
+    description?: string;
+}
+export interface UpdateProductCategoryDto {
+    name?: string;
+    description?: string;
+}
+export interface CreateProductDto {
+    productCode: string;
+    name: string;
+    categoryId: bigint;
+    unitPrice: Decimal;
+    unitType: string;
+    promotionId?: bigint;
+    description?: string;
+    imageUrl?: string;
+}
+export interface UpdateProductDto {
+    productCode?: string;
+    name?: string;
+    categoryId?: bigint;
+    unitPrice?: Decimal;
+    unitType?: string;
+    promotionId?: bigint;
+    description?: string;
+    imageUrl?: string;
+    active?: boolean;
+}
+export interface Promotion {
+    id: bigint;
+    title: string;
+    discountPercent: Decimal;
+    startDate: Date;
+    endDate: Date;
+    active: boolean;
+}
+export interface CreatePromotionDto {
+    title: string;
+    discountPercent: number;
+    startDate: Date;
+    endDate: Date;
+    active?: boolean;
+}
+export interface UpdatePromotionDto {
+    title?: string;
+    discountPercent?: number;
+    startDate?: Date;
+    endDate?: Date;
+    active?: boolean;
 }

@@ -8,6 +8,7 @@ dotenv_1.default.config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const passport_1 = __importDefault(require("passport"));
+const path_1 = __importDefault(require("path"));
 const index_1 = __importDefault(require("./src/routes/index"));
 const errorHandler_1 = __importDefault(require("./src/middleware/errorHandler"));
 const app = (0, express_1.default)();
@@ -19,6 +20,8 @@ app.use(passport_1.default.initialize());
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+// Serve static files for uploads
+app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "uploads")));
 // Routes
 app.use("/isdn/api", index_1.default);
 // Health check

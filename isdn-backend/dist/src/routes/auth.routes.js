@@ -7,11 +7,13 @@ const express_1 = __importDefault(require("express"));
 const auth_controller_1 = __importDefault(require("../controllers/auth.controller"));
 const auth_1 = require("../middleware/auth");
 const router = express_1.default.Router();
-// POST /api/auth/login
+// user login
 router.post("/login", auth_controller_1.default.login);
-// POST /api/auth/register
+// user registration
 router.post("/register", auth_controller_1.default.register);
-// GET /api/auth/me (requires authentication)
-router.get("/me", auth_1.authenticate, auth_controller_1.default.getCurrentUser);
+// get current user
+router.get("/log", auth_1.authenticate, auth_controller_1.default.getCurrentUser);
+// logout
+router.post("/logout", auth_1.authenticate, auth_controller_1.default.logout);
 exports.default = router;
 //# sourceMappingURL=auth.routes.js.map
