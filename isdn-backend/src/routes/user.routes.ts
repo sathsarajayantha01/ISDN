@@ -27,7 +27,7 @@ router.put("/:id", authenticate, userController.updateUser);
 router.delete(
   "/:id",
   authenticate,
-  authorize(["Super Admin"]),
+  authorize(["System Administrator"]),
   userController.deleteUser,
 );
 
@@ -35,7 +35,7 @@ router.delete(
 router.patch(
   "/:id/activate",
   authenticate,
-  authorize(["Super Admin"]),
+  authorize(["System Administrator"]),
   userController.activateUser,
 );
 

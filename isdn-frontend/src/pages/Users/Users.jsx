@@ -106,9 +106,12 @@ export function Users() {
     setLoading(true);
     console.log("Get Users");
     try {
-      const response = await apiAdapter.get("/users", {
-        branchId: currentUser?.branchId || null,
-      });
+      const config = currentUser?.branchId
+        ? { params: { branchId: currentUser.branchId } } // or headers if it's a header
+        : {};
+
+      const response = await apiAdapter.get("/users", config);
+
       if (response.success && response.data) {
         setUsers(response.data);
       }
