@@ -14,7 +14,7 @@ router.get("/:id", authenticate, promotionsController.getPromotionById);
 router.post(
   "/",
   authenticate,
-  authorize(["admin", "manager"]),
+  authorize(["System Administrator", "Head Office Manager"]),
   promotionsController.createPromotion,
 );
 
@@ -22,7 +22,7 @@ router.post(
 router.put(
   "/:id",
   authenticate,
-  authorize(["admin", "manager"]),
+  authorize(["System Administrator", "Head Office Manager"]),
   promotionsController.updatePromotion,
 );
 
@@ -30,7 +30,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorize(["admin"]),
+  authorize(["System Administrator"]),
   promotionsController.deletePromotion,
 );
 

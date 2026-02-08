@@ -22,7 +22,7 @@ router.get("/:id", authenticate, productController.getProductById);
 router.post(
   "/",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   uploadMultiple,
   productController.createProduct,
 );
@@ -31,7 +31,7 @@ router.post(
 router.put(
   "/:id",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   uploadMultiple,
   productController.updateProduct,
 );
@@ -40,7 +40,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorize(["Super Admin"]),
+  authorize(["System Administrator"]),
   productController.deleteProduct,
 );
 
@@ -48,7 +48,7 @@ router.delete(
 router.patch(
   "/:id/activate",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productController.activateProduct,
 );
 
@@ -56,7 +56,7 @@ router.patch(
 router.patch(
   "/:id/deactivate",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productController.deactivateProduct,
 );
 
@@ -64,7 +64,7 @@ router.patch(
 router.patch(
   "/quantity/:id",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productController.updateProductQuantity,
 );
 
@@ -72,7 +72,7 @@ router.patch(
 router.put(
   "/transfer/:id",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productController.transferProductQuantity,
 );
 
@@ -80,7 +80,7 @@ router.put(
 router.post(
   "/transfer/review/:id",
   authenticate,
-  authorize(["Super Admin", "Admin", "Retail Customer"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productController.reviewTransferQuantity,
 );
 

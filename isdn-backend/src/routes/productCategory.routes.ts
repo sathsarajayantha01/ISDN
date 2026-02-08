@@ -17,7 +17,7 @@ router.get("/:id", authenticate, productCategoryController.getCategoryById);
 router.post(
   "/",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productCategoryController.createCategory,
 );
 
@@ -25,7 +25,7 @@ router.post(
 router.put(
   "/:id",
   authenticate,
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productCategoryController.updateCategory,
 );
 
@@ -33,7 +33,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorize(["Super Admin"]),
+  authorize(["System Administrator", "Head Office Manager", "RDC Staff"]),
   productCategoryController.deleteCategory,
 );
 

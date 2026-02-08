@@ -16,28 +16,28 @@ router.use(authenticate);
 // Create new branch
 router.post(
   "/",
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager"]),
   branchController.createBranch,
 );
 
 // Update branch
 router.put(
   "/:id",
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager"]),
   branchController.updateBranch,
 );
 
 // Delete branch
 router.delete(
   "/:id",
-  authorize(["Super Admin"]),
+  authorize(["System Administrator"]),
   branchController.deleteBranch,
 );
 
 // Activate branch
 router.patch(
   "/:id/activate",
-  authorize(["Super Admin", "Admin"]),
+  authorize(["System Administrator", "Head Office Manager"]),
   branchController.activateBranch,
 );
 

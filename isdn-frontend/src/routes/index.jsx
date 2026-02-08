@@ -7,6 +7,7 @@ import { Customers } from "../pages/Customers/Customers";
 import { ProductCategory } from "../pages/ProductCategory/ProductCategory";
 import { Product } from "../pages/Product/Product";
 import { Inventory } from "../pages/Inventory/Inventory";
+import { CustomerProduct } from "../pages/CustomerProduct/CustomerProduct";
 
 export const routes = [
   {
@@ -18,6 +19,11 @@ export const routes = [
     path: "product-categories",
     element: ProductCategory,
     label: "Product Categories",
+  },
+  {
+    path: "customer-products",
+    element: CustomerProduct,
+    label: "Customer Products",
   },
   {
     path: "products",

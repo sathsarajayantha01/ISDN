@@ -48,58 +48,114 @@ export function Sidebar({
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      roles: [
+        "System Administrator",
+        "Retail Customer",
+        "Business Customer",
+        "RDC Staff",
+        "Logistics Officer",
+        "Driver",
+        "Head Office Manager",
+      ],
     },
     {
       id: "product-categories",
       label: "Product Categories",
       icon: Package,
+      roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
+    },
+    {
+      id: "customer-products",
+      label: "Customer Products",
+      icon: Package,
+      roles: ["Business Customer", "Retail Customer"],
     },
     {
       id: "products",
       label: "Products",
       icon: Package,
+      roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
     },
     {
       id: "inventory",
       label: "Inventory",
       icon: Package,
+      roles: [
+        "System Administrator",
+        "RDC Staff",
+        "Logistics Officer",
+        "Head Office Manager",
+      ],
     },
     {
       id: "orders",
       label: "Orders",
       icon: ShoppingCart,
+      roles: [
+        "System Administrator",
+        "RDC Staff",
+        "Logistics Officer",
+        "Retail Customer",
+        "Business Customer",
+        "Head Office Manager",
+      ],
     },
     {
       id: "deliveries",
       label: "Deliveries",
       icon: Truck,
+      roles: [
+        "System Administrator",
+        "Logistics Officer",
+        "Driver",
+        "Head Office Manager",
+      ],
     },
     {
       id: "fleet",
       label: "Fleet",
       icon: Car,
+      roles: [
+        "System Administrator",
+        "Logistics Officer",
+        "Head Office Manager",
+      ],
     },
     {
       id: "adminUsers",
       label: "Admin Users",
       icon: Users,
+      roles: ["System Administrator"],
     },
     {
       id: "drivers",
       label: "Drivers",
       icon: Users,
+      roles: [
+        "System Administrator",
+        "Logistics Officer",
+        "Head Office Manager",
+      ],
     },
     {
       id: "customers",
       label: "Customers",
       icon: Users,
+      roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
     },
     {
       id: "reports",
       label: "Reports",
       icon: FileText,
+      roles: ["System Administrator", "Head Office Manager"],
     },
   ];
+
+  // Filter nav items based on user role
+  const filteredNavItems = navItems.filter((item) => {
+    if (!loggedUser?.role) return false;
+    return item.roles.includes(loggedUser.role);
+  });
 
   return (
     <aside
@@ -124,8 +180,8 @@ export function Sidebar({
           Current Branch
         </label>
 
-        {/* if logged user rolename = Super admin show branch list else shwoing current branch */}
-        {loggedUser?.role === "Super Admin" ? (
+        {/* if logged user rolename = System Administrator show branch list else showing current branch */}
+        {loggedUser?.role === "System Administrator" ? (
           <div className="relative">
             <select
               value={currentBranch.id}
@@ -153,7 +209,7 @@ export function Sidebar({
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 sm:py-6 px-2 sm:px-3 space-y-1 bg-white">
-        {navItems.map((item) => {
+        {filteredNavItems.map((item) => {
           const isActive = activePage === item.id;
           return (
             <button
@@ -161,11 +217,11 @@ export function Sidebar({
               onClick={() => onNavigate(item.id)}
               className={`
                 w-full flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200
-                ${isActive ? "bg-blue-100 text-blue-800 border border-blue-400" : "text-gray-400  hover:bg-blue-50 hover:text-blue-600"}
+                ${isActive ? "bg-blue-950 text-white border " : "text-gray-600  hover:bg-blue-100 "}
               `}
             >
               <item.icon
-                className={`h-5 w-5 flex-shrink-0 hover:text-blue-600  ${isActive ? "text-blue-800 " : " text-gray-400 "}`}
+                className={`h-5 w-5 flex-shrink-0   ${isActive ? "text-white " : " text-gray-600 "}`}
               />
 
               <span className="truncate">{item.label}</span>
@@ -178,7 +234,7 @@ export function Sidebar({
       <div className="p-3 sm:p-4 border-t border-slate-200 bg-slate-100">
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 w-full p-3 border bg-white hover:border-red-100 rounded-lg hover:bg-red-100 text-red-400 hover:text-red-500 transition-colors"
+          className="flex items-center gap-3 w-full px-3 py-3 sm:py-2.5 border bg-white  rounded-lg hover:bg-red-800 text-red-400 hover:text-white transition-colors"
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
           <span className="text-sm font-medium">Sign Out</span>
