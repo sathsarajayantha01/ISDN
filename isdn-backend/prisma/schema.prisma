@@ -74,7 +74,8 @@ model Branch {
   users            User[]          @relation("UserBranch")
   assignedCustomers User[]         @relation("CustomerAssignedBranch")
   vehicles         Vehicle[]
-  inventories      Inventory[]
+  inventories      Inventory[]     @relation("InventoryBranch")
+  reservedInventories Inventory[]  @relation("ReservedBranch")
   orders           Order[]
   transfersFrom    StockTransfer[] @relation("FromBranch")
   transfersTo      StockTransfer[] @relation("ToBranch")
@@ -118,8 +119,22 @@ model Product {
   inventories   Inventory[]
   orderItems    OrderItem[]
   stockTransfers StockTransfer[]
+  productImages ProductImage[]
+
 
   @@map("product")
+}
+
+// New model for store product images
+model ProductImage {
+  id        BigInt   @id @default(autoincrement())
+  productId BigInt   @map("product_id")
+  imageUrl  String   @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("product_image")
 }
 
 
@@ -137,12 +152,16 @@ model Inventory {
   productId        BigInt   @map("product_id")
   branchId         BigInt   @map("branch_id")
   quantity         Int
+  active           Boolean  @default(true)
   reservedQuantity Int      @default(0) @map("reserved_quantity")
+  reservedBranchId  BigInt?  @map("reserved_branch_id")
   lastUpdated      DateTime @default(now()) @updatedAt @map("last_updated")
 
   product          Product  @relation(fields: [productId], references: [id])
-  branch           Branch   @relation(fields: [branchId], references: [id])
+  branch           Branch   @relation("InventoryBranch", fields: [branchId], references: [id])
+  reservedBranch   Branch?  @relation("ReservedBranch", fields: [reservedBranchId], references: [id])
 
+  @@unique([productId, branchId])
   @@map("inventory")
 }
 

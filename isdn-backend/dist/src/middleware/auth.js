@@ -33,7 +33,39 @@ passport_1.default.use(new passport_jwt_1.Strategy(jwtOptions, async (payload, d
         return done(error, false);
     }
 }));
-const authenticate = passport_1.default.authenticate("jwt", { session: false });
+const authenticate = (req, res, next) => {
+    passport_1.default.authenticate("jwt", { session: false }, async (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: info?.message || "Unauthorized",
+            });
+        }
+        // Check if token is blacklisted
+        const token = passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+        if (token) {
+            try {
+                const blacklistedToken = await database_1.default.blacklistedToken.findUnique({
+                    where: { token },
+                });
+                if (blacklistedToken) {
+                    return res.status(401).json({
+                        success: false,
+                        message: "Token has been revoked",
+                    });
+                }
+            }
+            catch (error) {
+                return next(error);
+            }
+        }
+        req.user = user;
+        next();
+    })(req, res, next);
+};
 exports.authenticate = authenticate;
 const authorize = (roles) => {
     return (req, res, next) => {

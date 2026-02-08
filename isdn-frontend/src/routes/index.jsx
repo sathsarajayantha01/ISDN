@@ -1,11 +1,12 @@
 import React from "react";
 import { Dashboard } from "../pages/Dashboard";
-import { Inventory } from "../pages/Inventory";
 import { Orders } from "../pages/Orders";
 import { Users } from "../pages/Users/Users";
 import { Drivers } from "../pages/Drivers/Drivers";
 import { Customers } from "../pages/Customers/Customers";
 import { ProductCategory } from "../pages/ProductCategory/ProductCategory";
+import { Product } from "../pages/Product/Product";
+import { Inventory } from "../pages/Inventory/Inventory";
 
 export const routes = [
   {
@@ -17,6 +18,11 @@ export const routes = [
     path: "product-categories",
     element: ProductCategory,
     label: "Product Categories",
+  },
+  {
+    path: "products",
+    element: Product,
+    label: "Products",
   },
   {
     path: "inventory",

@@ -149,6 +149,14 @@ export interface Product {
   description?: string | null;
   imageUrl?: string | null;
   active: boolean;
+  productImages?: ProductImage[];
+}
+
+export interface ProductImage {
+  id: bigint;
+  productId: bigint;
+  imageUrl: string;
+  createdAt: Date;
 }
 
 export interface CreateProductCategoryDto {
@@ -169,7 +177,9 @@ export interface CreateProductDto {
   unitType: string;
   promotionId?: bigint;
   description?: string;
+  image?: string;
   imageUrl?: string;
+  imageUrls?: string[];
 }
 
 export interface UpdateProductDto {
@@ -180,6 +190,33 @@ export interface UpdateProductDto {
   unitType?: string;
   promotionId?: bigint;
   description?: string;
+  image?: string;
   imageUrl?: string;
+  imageUrls?: string[];
+  active?: boolean;
+}
+
+export interface Promotion {
+  id: bigint;
+  title: string;
+  discountPercent: Decimal;
+  startDate: Date;
+  endDate: Date;
+  active: boolean;
+}
+
+export interface CreatePromotionDto {
+  title: string;
+  discountPercent: number;
+  startDate: Date;
+  endDate: Date;
+  active?: boolean;
+}
+
+export interface UpdatePromotionDto {
+  title?: string;
+  discountPercent?: number;
+  startDate?: Date;
+  endDate?: Date;
   active?: boolean;
 }

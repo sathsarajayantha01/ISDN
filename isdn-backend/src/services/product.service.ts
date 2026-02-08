@@ -1,10 +1,15 @@
 import productRepository from "../repositories/product.repository";
 import productCategoryRepository from "../repositories/productCategory.repository";
+import promotionsRepository from "../repositories/promotions.repository";
 import { Product, CreateProductDto, UpdateProductDto } from "../types";
 
 class ProductService {
-  async getAllProducts(): Promise<Product[]> {
-    return await productRepository.findAll();
+  async getAllProducts(branchId: string | undefined): Promise<Product[]> {
+    if (branchId) {
+      return await productRepository.findAllByBranchId(branchId);
+    } else {
+      return await productRepository.findAll();
+    }
   }
 
   async getProductById(id: string | number): Promise<Product> {
@@ -49,7 +54,10 @@ class ProductService {
     id: string | number,
     productData: UpdateProductDto,
   ): Promise<Product> {
-    await this.getProductById(id);
+    const products = await this.getProductById(id);
+    if (!products) {
+      throw new Error("Product not found");
+    }
 
     // If product code is being updated, check if it's already in use by another product
     if (productData.productCode) {
@@ -70,6 +78,19 @@ class ProductService {
         throw new Error("Product category not found");
       }
     }
+
+    // promotion is available given id if promotionId is being updated
+    if (productData.promotionId) {
+      const promotion = await promotionsRepository.findById(
+        Number(productData.promotionId),
+      );
+      if (!promotion) {
+        throw new Error("Promotion not found");
+      }
+    }
+
+    // If new images are provided, they will be handled in the repository
+    // including deletion of old images
 
     return await productRepository.update(id, productData);
   }
@@ -96,6 +117,107 @@ class ProductService {
   async deactivateProduct(id: string | number): Promise<Product> {
     await this.getProductById(id);
     return await productRepository.update(id, { active: false });
+  }
+
+  async updateProductQuantity(
+    id: string | number,
+    branchId: string | number,
+    quantity: number,
+  ): Promise<Product> {
+    const product = await productRepository.getProductByIdandBranchId(
+      id,
+      branchId,
+    );
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    // Update quantity in inventory
+    const updatedProduct = await productRepository.updateProductQuantity(
+      id,
+      branchId,
+      quantity,
+    );
+
+    if (!updatedProduct) {
+      throw new Error("Failed to update product quantity");
+    }
+
+    return updatedProduct;
+  }
+
+  async transferProductQuantity(
+    id: string | number,
+    fromBranchId: string | number,
+    toBranchId: string | number,
+    quantity: number,
+  ): Promise<Product> {
+    const product = await productRepository.getProductByIdandBranchId(
+      id,
+      fromBranchId,
+    );
+    if (!product) {
+      throw new Error("Product not found in the source branch inventory");
+    }
+
+    // Check if reserve branch and reserve quantity exist
+    const reserveBranch =
+      await productRepository.getInventoryByProductIdAndBranchId(
+        id,
+        toBranchId,
+      );
+    if (
+      reserveBranch.reservedQuantity != null &&
+      reserveBranch.reservedQuantity > 0
+    ) {
+      throw new Error(
+        "Cannot transfer product quantity because there is a pending reservation in the destination branch",
+      );
+    }
+
+    // Transfer quantity between branches
+    const updatedProduct = await productRepository.transferProductQuantity(
+      id,
+      fromBranchId,
+      toBranchId,
+      quantity,
+    );
+
+    if (!updatedProduct) {
+      throw new Error("Failed to transfer product quantity");
+    }
+
+    return updatedProduct;
+  }
+
+  async reviewTransferQuantity(
+    id: string | number,
+    branchId: string | number,
+    status: "accept" | "reject",
+  ): Promise<Product> {
+    if (status !== "accept" && status !== "reject") {
+      throw new Error("Invalid status. Must be 'accept' or 'reject'");
+    }
+
+    const product = await productRepository.getProductByIdandBranchId(
+      id,
+      branchId,
+    );
+    if (!product) {
+      throw new Error("Product not found in branch inventory");
+    }
+
+    const updatedProduct = await productRepository.reviewTransferQuantity(
+      id,
+      branchId,
+      status,
+    );
+
+    if (!updatedProduct) {
+      throw new Error("Failed to review transfer quantity");
+    }
+
+    return updatedProduct;
   }
 }
 

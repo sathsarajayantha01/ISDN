@@ -4,10 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_service_1 = __importDefault(require("../services/user.service"));
+const serializer_1 = require("../utils/serializer");
 class UserController {
     async getAllUsers(req, res, next) {
         try {
-            const users = await user_service_1.default.getAllUsers();
+            const branchId = req.headers.branchid;
+            const roleId = req.query.roleId;
+            const users = await user_service_1.default.getAllUsers(branchId, roleId);
             // Remove password from response
             const sanitizedUsers = users.map((user) => {
                 const { password, ...userWithoutPassword } = user;
@@ -15,7 +18,7 @@ class UserController {
             });
             res.json({
                 success: true,
-                data: sanitizedUsers,
+                data: (0, serializer_1.serializeBigInt)(sanitizedUsers),
                 message: "Users retrieved successfully",
             });
         }
@@ -26,12 +29,13 @@ class UserController {
     async getUserById(req, res, next) {
         try {
             const { id } = req.params;
-            const user = await user_service_1.default.getUserById(id);
+            const users = await user_service_1.default.getUserById(id);
             // Remove password from response
+            const user = users[0];
             const { password, ...userWithoutPassword } = user;
             res.json({
                 success: true,
-                data: userWithoutPassword,
+                data: (0, serializer_1.serializeBigInt)(userWithoutPassword),
                 message: "User retrieved successfully",
             });
         }
@@ -47,7 +51,7 @@ class UserController {
             const { password, ...userWithoutPassword } = newUser;
             res.status(201).json({
                 success: true,
-                data: userWithoutPassword,
+                data: (0, serializer_1.serializeBigInt)(userWithoutPassword),
                 message: "User created successfully",
             });
         }
@@ -64,7 +68,7 @@ class UserController {
             const { password, ...userWithoutPassword } = updatedUser;
             res.json({
                 success: true,
-                data: userWithoutPassword,
+                data: (0, serializer_1.serializeBigInt)(userWithoutPassword),
                 message: "User updated successfully",
             });
         }
@@ -107,7 +111,7 @@ class UserController {
             const { password, ...userWithoutPassword } = updatedUser;
             res.json({
                 success: true,
-                data: userWithoutPassword,
+                data: (0, serializer_1.serializeBigInt)(userWithoutPassword),
                 message: "User activated successfully",
             });
         }

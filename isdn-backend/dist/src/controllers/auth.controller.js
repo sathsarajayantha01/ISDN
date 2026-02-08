@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_service_1 = __importDefault(require("../services/user.service"));
+const serializer_1 = require("../utils/serializer");
+const database_1 = __importDefault(require("../../config/database"));
 class AuthController {
     async login(req, res, next) {
         try {
@@ -23,6 +25,13 @@ class AuthController {
             }
             else {
                 user = await user_service_1.default.getUserByUsername(username);
+            }
+            if (!user) {
+                res.status(401).json({
+                    success: false,
+                    message: "Invalid credentials",
+                });
+                return;
             }
             if (!user.active) {
                 res.status(401).json({
@@ -52,10 +61,10 @@ class AuthController {
             const { password: _, ...userWithoutPassword } = user;
             res.json({
                 success: true,
-                data: {
+                data: (0, serializer_1.serializeBigInt)({
                     token,
                     user: userWithoutPassword,
-                },
+                }),
                 message: "Login successful",
             });
         }
@@ -104,10 +113,10 @@ class AuthController {
             const { password: _, ...userWithoutPassword } = newUser;
             res.status(201).json({
                 success: true,
-                data: {
+                data: (0, serializer_1.serializeBigInt)({
                     token,
                     user: userWithoutPassword,
-                },
+                }),
                 message: "Registration successful",
             });
         }
@@ -127,11 +136,48 @@ class AuthController {
             }
             const user = await user_service_1.default.getUserById(userId);
             // Remove password from response
-            const { password: _, ...userWithoutPassword } = user;
+            // const { password: _, ...userWithoutPassword } = user;
             res.json({
                 success: true,
-                data: userWithoutPassword,
+                data: (0, serializer_1.serializeBigInt)(user),
                 message: "Current user retrieved successfully",
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async logout(req, res, next) {
+        try {
+            // Extract token from Authorization header
+            const authHeader = req.headers.authorization;
+            if (!authHeader || !authHeader.startsWith("Bearer ")) {
+                res.status(401).json({
+                    success: false,
+                    message: "No token provided",
+                });
+                return;
+            }
+            const token = authHeader.substring(7); // Remove "Bearer " prefix
+            // Decode token to get expiration time
+            const decoded = jsonwebtoken_1.default.decode(token);
+            if (!decoded || !decoded.exp) {
+                res.status(400).json({
+                    success: false,
+                    message: "Invalid token",
+                });
+                return;
+            }
+            // Add token to blacklist with its expiration time
+            await database_1.default.blacklistedToken.create({
+                data: {
+                    token,
+                    expiresAt: new Date(decoded.exp * 1000), // Convert to milliseconds
+                },
+            });
+            res.json({
+                success: true,
+                message: "Logout successful",
             });
         }
         catch (error) {

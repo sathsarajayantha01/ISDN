@@ -47,10 +47,6 @@ class BranchService {
         await this.getBranchById(id);
         return await branch_repository_1.default.update(id, { active: true });
     }
-    async deactivateBranch(id) {
-        await this.getBranchById(id);
-        return await branch_repository_1.default.update(id, { active: false });
-    }
 }
 exports.default = new BranchService();
 //# sourceMappingURL=branch.service.js.map

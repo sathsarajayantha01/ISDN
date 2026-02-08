@@ -6,7 +6,6 @@ declare class BranchService {
     updateBranch(id: string | number, branchData: UpdateBranchDto): Promise<Branch>;
     deleteBranch(id: string | number): Promise<Branch>;
     activateBranch(id: string | number): Promise<Branch>;
-    deactivateBranch(id: string | number): Promise<Branch>;
 }
 declare const _default: BranchService;
 export default _default;

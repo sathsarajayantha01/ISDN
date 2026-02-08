@@ -4,13 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const branch_service_1 = __importDefault(require("../services/branch.service"));
+const serializer_1 = require("../utils/serializer");
 class BranchController {
     async getAllBranches(req, res, next) {
         try {
             const branches = await branch_service_1.default.getAllBranches();
             res.json({
                 success: true,
-                data: branches,
+                data: (0, serializer_1.serializeBigInt)(branches),
                 message: "Branches retrieved successfully",
             });
         }
@@ -24,7 +25,7 @@ class BranchController {
             const branch = await branch_service_1.default.getBranchById(id);
             res.json({
                 success: true,
-                data: branch,
+                data: (0, serializer_1.serializeBigInt)(branch),
                 message: "Branch retrieved successfully",
             });
         }
@@ -48,7 +49,7 @@ class BranchController {
             const newBranch = await branch_service_1.default.createBranch(branchData);
             res.status(201).json({
                 success: true,
-                data: newBranch,
+                data: (0, serializer_1.serializeBigInt)(newBranch),
                 message: "Branch created successfully",
             });
         }
@@ -63,7 +64,7 @@ class BranchController {
             const updatedBranch = await branch_service_1.default.updateBranch(id, branchData);
             res.json({
                 success: true,
-                data: updatedBranch,
+                data: (0, serializer_1.serializeBigInt)(updatedBranch),
                 message: "Branch updated successfully",
             });
         }
@@ -90,7 +91,7 @@ class BranchController {
             const updatedBranch = await branch_service_1.default.activateBranch(id);
             res.json({
                 success: true,
-                data: updatedBranch,
+                data: (0, serializer_1.serializeBigInt)(updatedBranch),
                 message: "Branch activated successfully",
             });
         }

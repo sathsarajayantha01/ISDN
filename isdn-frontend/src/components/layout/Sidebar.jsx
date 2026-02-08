@@ -55,6 +55,11 @@ export function Sidebar({
       icon: Package,
     },
     {
+      id: "products",
+      label: "Products",
+      icon: Package,
+    },
+    {
       id: "inventory",
       label: "Inventory",
       icon: Package,

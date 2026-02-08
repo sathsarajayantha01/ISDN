@@ -5,6 +5,7 @@ import roleRoutes from "./role.routes";
 import branchRoutes from "./branch.routes";
 import productCategoryRoutes from "./productCategory.routes";
 import productRoutes from "./product.routes";
+import promotionRoutes from "./promotions.routes";
 
 const api: Application = express();
 
@@ -14,5 +15,6 @@ api.use("/roles", roleRoutes);
 api.use("/branches", branchRoutes);
 api.use("/product-categories", productCategoryRoutes);
 api.use("/products", productRoutes);
+api.use("/promotions", promotionRoutes);
 
 export default api;

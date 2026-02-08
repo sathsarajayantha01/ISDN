@@ -2,16 +2,18 @@ import { useState, useEffect } from "react";
 import { DataTable } from "../../components/data/DataTable";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Image } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { ProductCreateModel } from "./models/ProductCreateModel";
 import { ProductUpdateModel } from "./models/ProductUpdateModel";
+import { ProductImagesModal } from "./models/ProductImagesModal";
 
 export function Product() {
   const [product, setProduct] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isImagesModalOpen, setIsImagesModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,15 +21,44 @@ export function Product() {
   const filteredProduct = product.filter((item) => {
     const matchesSearch =
       item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.productCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
   const columns = [
     {
+      key: "productCode",
+      header: "Product Code",
+      sortable: true,
+    },
+    {
       key: "name",
       header: "Name",
       sortable: true,
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+      render: (categoryValue, item) => item.category?.name || "-",
+    },
+    {
+      key: "unitPrice",
+      header: "Unit Price",
+      sortable: true,
+      render: (priceValue) => `$${priceValue}`,
+    },
+    {
+      key: "unitType",
+      header: "Unit Type",
+      sortable: true,
+    },
+    {
+      key: "promotion",
+      header: "Promotion",
+      sortable: true,
+      render: (promotionValue, item) => item.promotion?.title || "-",
     },
     {
       key: "description",
@@ -42,7 +73,7 @@ export function Product() {
 
   useEffect(() => {
     if (currentUser !== null) {
-      fetchProductCategory();
+      fetchProduct();
     }
   }, [currentUser]);
 
@@ -107,6 +138,11 @@ export function Product() {
     setIsUpdateModalOpen(true);
   };
 
+  const handleViewImages = (product) => {
+    setSelectedProduct(product);
+    setIsImagesModalOpen(true);
+  };
+
   const handleDeleteProduct = async (product) => {
     if (confirm(`Are you sure you want to delete product ${product.name}?`)) {
       try {
@@ -160,6 +196,7 @@ export function Product() {
         data={filteredProduct}
         columns={columns}
         keyField="id"
+        onView={handleViewImages}
         onEdit={handleEditProduct}
         onDelete={handleDeleteProduct}
       />
@@ -180,6 +217,16 @@ export function Product() {
           setSelectedProduct(null);
         }}
         onSubmit={handleUpdateProduct}
+        product={selectedProduct}
+      />
+
+      {/* Product Images Modal */}
+      <ProductImagesModal
+        isOpen={isImagesModalOpen}
+        onClose={() => {
+          setIsImagesModalOpen(false);
+          setSelectedProduct(null);
+        }}
         product={selectedProduct}
       />
     </div>

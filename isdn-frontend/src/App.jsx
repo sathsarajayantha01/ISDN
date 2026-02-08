@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Login } from "./pages/Login/Login";
-import { ToastContainer } from "./components/feedback/ToastContainer";
-import { useToast } from "./hooks/useToast";
+import { ToastProvider, useToast } from "./context/ToastContext";
 import { branches } from "./data/mockData";
 import { apiAdapter } from "./services/apiAdapter";
 import { getRouteComponent } from "./routes";
@@ -27,11 +26,11 @@ const getCurrentBranchId = () => {
   return localStorage.getItem("branchId");
 };
 
-export function App() {
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activePage, setActivePage] = useState("dashboard");
   const [currentBranchId, setCurrentBranchId] = useState("1");
-  const { toasts, addToast, removeToast } = useToast();
+  const { addToast } = useToast();
 
   // Initialize authentication state from localStorage and fetch current user
   useEffect(() => {
@@ -134,28 +133,28 @@ export function App() {
 
   // Show Login page if not authenticated
   if (!isAuthenticated) {
-    return (
-      <>
-        <Login onLogin={handleLogin} />
-        <ToastContainer toasts={toasts} removeToast={removeToast} />
-      </>
-    );
+    return <Login onLogin={handleLogin} />;
   }
 
   return (
-    <>
-      <MainLayout
-        activePage={activePage}
-        onNavigate={setActivePage}
-        currentBranch={currentBranch}
-        branches={branches}
-        onSwitchBranch={handleSwitchBranch}
-        onLogout={handleLogout}
-        user={currentUser}
-      >
-        {renderPage()}
-      </MainLayout>
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-    </>
+    <MainLayout
+      activePage={activePage}
+      onNavigate={setActivePage}
+      currentBranch={currentBranch}
+      branches={branches}
+      onSwitchBranch={handleSwitchBranch}
+      onLogout={handleLogout}
+      user={currentUser}
+    >
+      {renderPage()}
+    </MainLayout>
+  );
+}
+
+export function App() {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   );
 }

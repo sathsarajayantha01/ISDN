@@ -4,18 +4,19 @@ import { authenticate, authorize } from "../middleware/auth";
 
 const router = express.Router();
 
-// Get all categories - public access
-router.get("/", productCategoryController.getAllCategories);
-
-// Get category by ID - public access
-router.get("/:id", productCategoryController.getCategoryById);
-
 // All category modification routes require authentication
 router.use(authenticate);
+
+// Get all categories - public access
+router.get("/", authenticate, productCategoryController.getAllCategories);
+
+// Get category by ID - public access
+router.get("/:id", authenticate, productCategoryController.getCategoryById);
 
 // Create new category
 router.post(
   "/",
+  authenticate,
   authorize(["Super Admin", "Admin"]),
   productCategoryController.createCategory,
 );
@@ -23,6 +24,7 @@ router.post(
 // Update category
 router.put(
   "/:id",
+  authenticate,
   authorize(["Super Admin", "Admin"]),
   productCategoryController.updateCategory,
 );
@@ -30,6 +32,7 @@ router.put(
 // Delete category
 router.delete(
   "/:id",
+  authenticate,
   authorize(["Super Admin"]),
   productCategoryController.deleteCategory,
 );

@@ -26,12 +26,25 @@ class UserRepository {
             },
         });
     }
+    async findByBranchId(branchId) {
+        return await database_1.default.user.findMany({
+            where: { branchId: BigInt(branchId) },
+            include: {
+                role: true,
+                branch: true,
+                assignedBranch: true,
+                vehicle: true,
+            },
+        });
+    }
     async findByEmail(email) {
         return await database_1.default.user.findUnique({
             where: { email },
             include: {
                 role: true,
                 branch: true,
+                assignedBranch: true,
+                vehicle: true,
             },
         });
     }
@@ -47,7 +60,17 @@ class UserRepository {
     async create(userData) {
         return await database_1.default.user.create({
             data: {
-                ...userData,
+                username: userData.username,
+                email: userData.email,
+                password: userData.password,
+                name: userData.name,
+                contactNumber: userData.contactNumber,
+                businessName: userData.businessName,
+                customerCode: userData.customerCode,
+                address: userData.address,
+                district: userData.district,
+                customerType: userData.customerType,
+                licenseNumber: userData.licenseNumber,
                 roleId: BigInt(userData.roleId),
                 branchId: userData.branchId ? BigInt(userData.branchId) : null,
                 assignedBranchId: userData.assignedBranchId
@@ -93,6 +116,13 @@ class UserRepository {
             where: { id: BigInt(id) },
             data: { password: hashedPassword },
         });
+    }
+    async getRoleNameById(roleId) {
+        const role = await database_1.default.role.findUnique({
+            where: { id: BigInt(roleId) },
+            select: { roleName: true },
+        });
+        return role?.roleName || null;
     }
 }
 exports.default = new UserRepository();
