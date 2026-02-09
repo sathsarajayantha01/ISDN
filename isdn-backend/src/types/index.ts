@@ -220,3 +220,43 @@ export interface UpdatePromotionDto {
   endDate?: Date;
   active?: boolean;
 }
+
+export interface Order {
+  id: bigint;
+  orderNumber: string;
+  userId: bigint;
+  branchId: bigint;
+  orderDate: Date;
+  status: string;
+  totalAmount: Decimal;
+  deliveryDate?: Date | null;
+  specialNotes?: string | null;
+  createdAt: Date;
+}
+
+export interface OrderItem {
+  id: bigint;
+  orderId: bigint;
+  productId: bigint;
+  quantity: number;
+  unitPrice: Decimal;
+  subtotal: Decimal;
+}
+
+export interface CreateOrderItemDto {
+  productId: bigint;
+  quantity: number;
+}
+
+export interface CreateOrderDto {
+  userId: bigint;
+  branchId: bigint;
+  items: CreateOrderItemDto[];
+  address?: string;
+  contactNumber?: string;
+  specialNotes?: string;
+}
+
+export interface UpdateOrderStatusDto {
+  status: string;
+}
