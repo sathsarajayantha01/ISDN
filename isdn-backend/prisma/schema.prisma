@@ -192,6 +192,8 @@ model Order {
   totalAmount  Decimal     @map("total_amount") @db.Decimal(10, 2)
   deliveryDate DateTime?   @map("delivery_date")
   specialNotes String?     @db.Text @map("special_notes")
+  address      String?     @db.Text
+  contactNumber String?     @db.Text @map("contact_number")
   createdAt    DateTime    @default(now()) @map("created_at")
 
   user         User        @relation(fields: [userId], references: [id])

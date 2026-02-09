@@ -1,0 +1,176 @@
+import { Request, Response, NextFunction } from "express";
+import orderService from "../services/order.service";
+import { CreateOrderDto, UpdateOrderStatusDto } from "../types";
+import { serializeBigInt } from "../utils/serializer";
+
+class OrderController {
+  async getAllOrders(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { userId, branchId, status } = req.query;
+
+      let orders;
+
+      if (userId) {
+        orders = await orderService.getOrdersByUserId(userId as string);
+      } else if (branchId) {
+        orders = await orderService.getOrdersByBranchId(branchId as string);
+      } else if (status) {
+        orders = await orderService.getOrdersByStatus(status as string);
+      } else {
+        orders = await orderService.getAllOrders();
+      }
+
+      res.json({
+        success: true,
+        data: serializeBigInt(orders),
+        message: "Orders retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getOrderById(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const order = await orderService.getOrderById(id as string);
+      res.json({
+        success: true,
+        data: serializeBigInt(order),
+        message: "Order retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getOrderByOrderNumber(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { orderNumber } = req.params;
+      const order = await orderService.getOrderByOrderNumber(
+        orderNumber as string,
+      );
+      res.json({
+        success: true,
+        data: serializeBigInt(order),
+        message: "Order retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getOrdersByUserId(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const orders = await orderService.getOrdersByUserId(userId as string);
+      res.json({
+        success: true,
+        data: serializeBigInt(orders),
+        message: "Orders retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createOrder(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const orderData: CreateOrderDto = req.body;
+
+      // Validate required fields
+      const requiredFields = ["userId", "branchId", "items"];
+      const missingFields = requiredFields.filter(
+        (field) => !orderData[field as keyof CreateOrderDto],
+      );
+
+      if (missingFields.length > 0) {
+        res.status(400).json({
+          success: false,
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+        });
+        return;
+      }
+
+      // Validate items structure
+      if (!Array.isArray(orderData.items) || orderData.items.length === 0) {
+        res.status(400).json({
+          success: false,
+          message: "Order must have at least one item",
+        });
+        return;
+      }
+
+      // Convert string IDs to bigint
+      orderData.userId = BigInt(orderData.userId);
+      orderData.branchId = BigInt(orderData.branchId);
+      orderData.items = orderData.items.map((item) => ({
+        productId: BigInt(item.productId),
+        quantity: Number(item.quantity),
+      }));
+
+      const order = await orderService.createOrder(orderData);
+      res.status(201).json({
+        success: true,
+        data: serializeBigInt(order),
+        message: "Order created successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateOrderStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const statusData: UpdateOrderStatusDto = req.body;
+
+      // Validate required fields
+      if (!statusData.status) {
+        res.status(400).json({
+          success: false,
+          message: "Status is required",
+        });
+        return;
+      }
+
+      const order = await orderService.updateOrderStatus(
+        id as string,
+        statusData,
+      );
+      res.json({
+        success: true,
+        data: serializeBigInt(order),
+        message: "Order status updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+export default new OrderController();
