@@ -29,8 +29,8 @@ router.post(
 );
 
 // Update order status
-router.patch(
-  "/:id/status",
+router.put(
+  "/status/:id",
   authenticate,
   authorize([
     "System Administrator",
@@ -40,6 +40,28 @@ router.patch(
     "Sales Representative",
   ]),
   orderController.updateOrderStatus,
+);
+
+// Assign driver to order
+router.put(
+  "/assign-driver/:id",
+  authenticate,
+  authorize([
+    "System Administrator",
+    "Head Office Manager",
+    "RDC Staff",
+    "Branch Manager",
+    "Sales Representative",
+  ]),
+  orderController.assignDriver,
+);
+
+// Update order location
+router.put(
+  "/location/:id",
+  authenticate,
+  authorize(["Driver", "System Administrator"]),
+  orderController.updateLocation,
 );
 
 export default router;

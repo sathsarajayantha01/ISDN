@@ -1,5 +1,11 @@
 import orderRepository from "../repositories/order.repository";
-import { Order, CreateOrderDto, UpdateOrderStatusDto } from "../types";
+import {
+  Order,
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+  AssignDriverDto,
+  UpdateLocationDto,
+} from "../types";
 import prisma from "../../config/database";
 
 class OrderService {
@@ -144,10 +150,81 @@ class OrderService {
 
     const updatedOrder = await orderRepository.updateStatus(
       id,
+      statusData.deliveryDate,
       statusData.status,
     );
     if (!updatedOrder) {
       throw new Error("Failed to update order status");
+    }
+
+    return updatedOrder;
+  }
+
+  async assignDriver(id: string | number, driverId: bigint): Promise<Order> {
+    // Verify order exists
+    const order = await this.getOrderById(id);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // Verify driver exists and has Driver role
+    const driver = await prisma.user.findUnique({
+      where: { id: BigInt(driverId) },
+      include: {
+        role: true,
+      },
+    });
+
+    if (!driver) {
+      throw new Error("Driver not found");
+    }
+
+    if (!driver.active) {
+      throw new Error("Driver is not active");
+    }
+
+    // Check if the user has a Driver role
+    if (driver.role.roleName !== "Driver") {
+      throw new Error("User is not a driver");
+    }
+
+    // Assign driver to order
+    const updatedOrder = await orderRepository.assignDriver(id, driverId);
+    if (!updatedOrder) {
+      throw new Error("Failed to assign driver to order");
+    }
+
+    return updatedOrder;
+  }
+
+  async updateLocation(
+    id: string | number,
+    locationData: UpdateLocationDto,
+  ): Promise<Order> {
+    // Verify order exists
+    const order = await this.getOrderById(id);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // Validate coordinates
+    if (locationData.latitude < -90 || locationData.latitude > 90) {
+      throw new Error("Latitude must be between -90 and 90");
+    }
+
+    if (locationData.longitude < -180 || locationData.longitude > 180) {
+      throw new Error("Longitude must be between -180 and 180");
+    }
+
+    // Update location
+    const updatedOrder = await orderRepository.updateLocation(
+      id,
+      locationData.latitude,
+      locationData.longitude,
+    );
+
+    if (!updatedOrder) {
+      throw new Error("Failed to update order location");
     }
 
     return updatedOrder;
