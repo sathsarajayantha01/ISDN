@@ -287,11 +287,12 @@ class OrderRepository {
 
   async updateStatus(
     id: string | number,
+    deliveryDate: Date,
     status: string,
   ): Promise<Order | null> {
     const order = await prisma.order.update({
       where: { id: BigInt(id) },
-      data: { status },
+      data: { status, deliveryDate },
       include: {
         user: {
           select: {
@@ -317,6 +318,102 @@ class OrderRepository {
                 productCode: true,
                 name: true,
                 unitType: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return order;
+  }
+
+  async assignDriver(
+    id: string | number,
+    driverId: bigint,
+  ): Promise<Order | null> {
+    const order = await prisma.order.update({
+      where: { id: BigInt(id) },
+      data: { driverId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            businessName: true,
+            customerCode: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                productCode: true,
+                name: true,
+                unitType: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return order;
+  }
+
+  async updateLocation(
+    id: string | number,
+    latitude: number,
+    longitude: number,
+  ): Promise<Order | null> {
+    const order = await prisma.order.update({
+      where: { id: BigInt(id) },
+      data: {
+        currentLocation: {
+          latitude,
+          longitude,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                productCode: true,
+                name: true,
               },
             },
           },

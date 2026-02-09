@@ -259,4 +259,13 @@ export interface CreateOrderDto {
 
 export interface UpdateOrderStatusDto {
   status: string;
+  deliveryDate: Date;
+}
+export interface AssignDriverDto {
+  driverId: bigint;
+}
+
+export interface UpdateLocationDto {
+  latitude: number;
+  longitude: number;
 }

@@ -50,8 +50,6 @@ export function Sidebar({
       icon: LayoutDashboard,
       roles: [
         "System Administrator",
-        "Retail Customer",
-        "Business Customer",
         "RDC Staff",
         "Logistics Officer",
         "Driver",
@@ -95,10 +93,14 @@ export function Sidebar({
         "System Administrator",
         "RDC Staff",
         "Logistics Officer",
-        "Retail Customer",
-        "Business Customer",
         "Head Office Manager",
       ],
+    },
+    {
+      id: "orders-history",
+      label: "Orders History",
+      icon: FileText,
+      roles: ["Retail Customer", "Business Customer"],
     },
     {
       id: "deliveries",
@@ -108,16 +110,6 @@ export function Sidebar({
         "System Administrator",
         "Logistics Officer",
         "Driver",
-        "Head Office Manager",
-      ],
-    },
-    {
-      id: "fleet",
-      label: "Fleet",
-      icon: Car,
-      roles: [
-        "System Administrator",
-        "Logistics Officer",
         "Head Office Manager",
       ],
     },
@@ -144,10 +136,18 @@ export function Sidebar({
       roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
     },
     {
-      id: "reports",
-      label: "Reports",
-      icon: FileText,
-      roles: ["System Administrator", "Head Office Manager"],
+      id: "account",
+      label: "My Account",
+      icon: Users,
+      roles: [
+        "System Administrator",
+        "RDC Staff",
+        "Head Office Manager",
+        "Logistics Officer",
+        "Driver",
+        "Retail Customer",
+        "Business Customer",
+      ],
     },
   ];
 

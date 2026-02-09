@@ -1,6 +1,6 @@
 import React from "react";
 import { Dashboard } from "../pages/Dashboard";
-import { Orders } from "../pages/Orders";
+import { OrdersManage } from "../pages/OrdersManage/OrdersManage";
 import { Users } from "../pages/Users/Users";
 import { Drivers } from "../pages/Drivers/Drivers";
 import { Customers } from "../pages/Customers/Customers";
@@ -8,6 +8,8 @@ import { ProductCategory } from "../pages/ProductCategory/ProductCategory";
 import { Product } from "../pages/Product/Product";
 import { Inventory } from "../pages/Inventory/Inventory";
 import { CustomerProduct } from "../pages/CustomerProduct/CustomerProduct";
+import { OrdersHistory } from "../pages/OrdersHistory/OrdersHistory";
+import { Account } from "../pages/Account/Account";
 
 export const routes = [
   {
@@ -37,8 +39,13 @@ export const routes = [
   },
   {
     path: "orders",
-    element: Orders,
+    element: OrdersManage,
     label: "Orders",
+  },
+  {
+    path: "orders-history",
+    element: OrdersHistory,
+    label: "Orders History",
   },
   {
     path: "adminUsers",
@@ -54,6 +61,11 @@ export const routes = [
     path: "customers",
     element: Customers,
     label: "Customers",
+  },
+  {
+    path: "account",
+    element: Account,
+    label: "My Account",
   },
 ];
 

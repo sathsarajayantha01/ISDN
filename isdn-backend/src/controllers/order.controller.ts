@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import orderService from "../services/order.service";
-import { CreateOrderDto, UpdateOrderStatusDto } from "../types";
+import {
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+  AssignDriverDto,
+  UpdateLocationDto,
+} from "../types";
 import { serializeBigInt } from "../utils/serializer";
 
 class OrderController {
@@ -166,6 +171,88 @@ class OrderController {
         success: true,
         data: serializeBigInt(order),
         message: "Order status updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async assignDriver(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const driverData: AssignDriverDto = req.body;
+
+      // Validate required fields
+      if (!driverData.driverId) {
+        res.status(400).json({
+          success: false,
+          message: "Driver ID is required",
+        });
+        return;
+      }
+
+      // Convert string ID to bigint
+      driverData.driverId = BigInt(driverData.driverId);
+
+      const order = await orderService.assignDriver(
+        id as string,
+        driverData.driverId,
+      );
+      res.json({
+        success: true,
+        data: serializeBigInt(order),
+        message: "Driver assigned successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateLocation(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const locationData: UpdateLocationDto = req.body;
+
+      // Validate required fields
+      if (
+        locationData.latitude === undefined ||
+        locationData.longitude === undefined
+      ) {
+        res.status(400).json({
+          success: false,
+          message: "Latitude and longitude are required",
+        });
+        return;
+      }
+
+      // Validate data types
+      if (
+        typeof locationData.latitude !== "number" ||
+        typeof locationData.longitude !== "number"
+      ) {
+        res.status(400).json({
+          success: false,
+          message: "Latitude and longitude must be numbers",
+        });
+        return;
+      }
+
+      const order = await orderService.updateLocation(
+        id as string,
+        locationData,
+      );
+      res.json({
+        success: true,
+        data: serializeBigInt(order),
+        message: "Order location updated successfully",
       });
     } catch (error) {
       next(error);

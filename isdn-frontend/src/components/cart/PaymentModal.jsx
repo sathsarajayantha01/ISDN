@@ -7,14 +7,13 @@ import { Card } from "../ui/Card";
 
 export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
   const [formData, setFormData] = useState({
-    deliveryDate: "",
-    deliveryTime: "09:00",
+    address: "",
+    contactNumber: "",
     specialNotes: "",
     cardNumber: "",
     cardName: "",
     expiryDate: "",
     cvv: "",
-    billingAddress: "",
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,16 +41,16 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate delivery date
-    if (!formData.deliveryDate) {
-      newErrors.deliveryDate = "Delivery date is required";
-    } else {
-      const selectedDate = new Date(formData.deliveryDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        newErrors.deliveryDate = "Delivery date cannot be in the past";
-      }
+    // Validate address
+    if (!formData.address) {
+      newErrors.address = "Address is required";
+    }
+
+    // Validate contact number
+    if (!formData.contactNumber) {
+      newErrors.contactNumber = "Contact number is required";
+    } else if (!/^\d{10,11}$/.test(formData.contactNumber)) {
+      newErrors.contactNumber = "Contact number must be 10 or 11 digits";
     }
 
     // Validate card number (basic validation)
@@ -78,11 +77,6 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
       newErrors.cvv = "CVV is required";
     } else if (!/^\d{3,4}$/.test(formData.cvv)) {
       newErrors.cvv = "CVV must be 3 or 4 digits";
-    }
-
-    // Validate billing address
-    if (!formData.billingAddress) {
-      newErrors.billingAddress = "Billing address is required";
     }
 
     setErrors(newErrors);
@@ -131,18 +125,21 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
 
     setIsProcessing(true);
 
-    // Format delivery date and time
-    const deliveryDateTime = `${formData.deliveryDate} ${formData.deliveryTime}:00`;
+    // Format delivery date
+    const deliveryDateTime = new Date();
 
     try {
       await onConfirmOrder({
+        address: formData.address,
+        contactNumber: formData.contactNumber,
         deliveryDate: deliveryDateTime,
         specialNotes: formData.specialNotes || "None",
         paymentInfo: {
           cardNumber: formData.cardNumber,
           cardName: formData.cardName,
           expiryDate: formData.expiryDate,
-          billingAddress: formData.billingAddress,
+          address: formData.address,
+          contactNumber: formData.contactNumber,
         },
       });
     } catch (error) {
@@ -209,7 +206,7 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
           </h3>
           <div className="mt-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Address
+              Address *
             </label>
             <textarea
               name="address"
@@ -217,22 +214,33 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
               onChange={handleInputChange}
               rows="2"
               placeholder="123 Main St, City, State, ZIP"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
+                errors.address ? "border-red-500" : "border-slate-300"
+              }`}
             />
+            {errors.address && (
+              <p className="text-xs text-red-600 mt-1">{errors.address}</p>
+            )}
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Contact Number
+              Contact Number *
             </label>
             <input
               type="text"
               name="contactNumber"
               value={formData.contactNumber}
               onChange={handleInputChange}
-              rows="2"
-              placeholder="(123) 456-7890"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="1234567890"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
+                errors.contactNumber ? "border-red-500" : "border-slate-300"
+              }`}
             />
+            {errors.contactNumber && (
+              <p className="text-xs text-red-600 mt-1">
+                {errors.contactNumber}
+              </p>
+            )}
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -329,27 +337,6 @@ export function PaymentModal({ isOpen, onClose, cart, onConfirmOrder }) {
                   <p className="text-xs text-red-600 mt-1">{errors.cvv}</p>
                 )}
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Billing Address *
-              </label>
-              <textarea
-                name="billingAddress"
-                value={formData.billingAddress}
-                onChange={handleInputChange}
-                rows="2"
-                placeholder="123 Main St, City, State, ZIP"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
-                  errors.billingAddress ? "border-red-500" : "border-slate-300"
-                }`}
-              />
-              {errors.billingAddress && (
-                <p className="text-xs text-red-600 mt-1">
-                  {errors.billingAddress}
-                </p>
-              )}
             </div>
           </div>
         </div>
