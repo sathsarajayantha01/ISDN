@@ -1,6 +1,5 @@
-import React from "react";
 import { Dashboard } from "../pages/Dashboard";
-import { OrdersManage } from "../pages/OrdersManage/OrdersManage";
+import { ActiveOrders } from "../pages/ActiveOrders/ActiveOrders";
 import { Users } from "../pages/Users/Users";
 import { Drivers } from "../pages/Drivers/Drivers";
 import { Customers } from "../pages/Customers/Customers";
@@ -10,6 +9,7 @@ import { Inventory } from "../pages/Inventory/Inventory";
 import { CustomerProduct } from "../pages/CustomerProduct/CustomerProduct";
 import { OrdersHistory } from "../pages/OrdersHistory/OrdersHistory";
 import { Account } from "../pages/Account/Account";
+import { Deliveries } from "../pages/Deliveries/Deliveries";
 
 export const routes = [
   {
@@ -38,14 +38,19 @@ export const routes = [
     label: "Inventory",
   },
   {
-    path: "orders",
-    element: OrdersManage,
-    label: "Orders",
+    path: "active-orders",
+    element: ActiveOrders,
+    label: "Active Orders",
   },
   {
     path: "orders-history",
     element: OrdersHistory,
     label: "Orders History",
+  },
+  {
+    path: "deliveries",
+    element: Deliveries,
+    label: "Deliveries",
   },
   {
     path: "adminUsers",

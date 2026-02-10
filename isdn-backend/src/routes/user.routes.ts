@@ -14,6 +14,9 @@ router.patch(
 // Get all users
 router.get("/", authenticate, userController.getAllUsers);
 
+// Get users by role name (using query parameter, must come before /:id)
+router.get("/role", authenticate, userController.getUsersByRoleName);
+
 // Get user by ID
 router.get("/:id", authenticate, userController.getUserById);
 

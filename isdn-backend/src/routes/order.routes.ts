@@ -7,18 +7,21 @@ const router = express.Router();
 // Get all orders (supports filtering by userId, branchId, status via query params)
 router.get("/", authenticate, orderController.getAllOrders);
 
-// Get order by order number
+// Get order by order number (must come before /:id)
 router.get(
   "/orderNumber/:orderNumber",
   authenticate,
   orderController.getOrderByOrderNumber,
 );
 
-// Get order by ID
-router.get("/:id", authenticate, orderController.getOrderById);
-
-// Get orders for a specific user
+// Get orders for a specific user (must come before /:id)
 router.get("/user/:userId", authenticate, orderController.getOrdersByUserId);
+
+// Get orders for specific driver using query param (must come before /:id)
+router.get("/driver", authenticate, orderController.getOrdersByDriverId);
+
+// Get order by ID (generic route, must come after specific routes)
+router.get("/:id", authenticate, orderController.getOrderById);
 
 // Create new order
 router.post(

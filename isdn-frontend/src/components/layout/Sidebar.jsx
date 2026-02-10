@@ -86,8 +86,8 @@ export function Sidebar({
       ],
     },
     {
-      id: "orders",
-      label: "Orders",
+      id: "active-orders",
+      label: "Active Orders",
       icon: ShoppingCart,
       roles: [
         "System Administrator",

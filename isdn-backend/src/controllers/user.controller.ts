@@ -49,6 +49,49 @@ class UserController {
     }
   }
 
+  async getUsersByRoleName(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { roleName } = req.query;
+
+      if (!roleName) {
+        res.status(400).json({
+          success: false,
+          message: "Role name is required",
+        });
+        return;
+      }
+
+      const users = await userService.getUsersByRoleName(roleName as string);
+
+      // Remove password from response
+      const sanitizedUsers = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+
+      if (sanitizedUsers.length === 0) {
+        res.status(404).json({
+          success: false,
+          message: `No users found with role: ${roleName}`,
+          data: [],
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: serializeBigInt(sanitizedUsers),
+        message: "Users retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createUser(
     req: Request,
     res: Response,
