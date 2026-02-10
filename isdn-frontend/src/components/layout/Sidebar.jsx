@@ -3,13 +3,19 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Package,
+  Package2,
   ShoppingCart,
   Truck,
-  Car,
+  Archive,
+  Boxes,
+  BaggageClaim,
   Users,
+  User,
   FileText,
   ChevronDown,
+  UserRoundCog,
   LogOut,
+  UserRoundPen,
   X,
 } from "lucide-react";
 
@@ -52,20 +58,19 @@ export function Sidebar({
         "System Administrator",
         "RDC Staff",
         "Logistics Officer",
-        "Driver",
         "Head Office Manager",
       ],
     },
     {
       id: "product-categories",
       label: "Product Categories",
-      icon: Package,
+      icon: Package2,
       roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
     },
     {
       id: "customer-products",
       label: "Customer Products",
-      icon: Package,
+      icon: Boxes,
       roles: ["Business Customer", "Retail Customer"],
     },
     {
@@ -77,7 +82,7 @@ export function Sidebar({
     {
       id: "inventory",
       label: "Inventory",
-      icon: Package,
+      icon: Archive,
       roles: [
         "System Administrator",
         "RDC Staff",
@@ -88,7 +93,7 @@ export function Sidebar({
     {
       id: "active-orders",
       label: "Active Orders",
-      icon: ShoppingCart,
+      icon: BaggageClaim,
       roles: [
         "System Administrator",
         "RDC Staff",
@@ -122,13 +127,13 @@ export function Sidebar({
     {
       id: "adminUsers",
       label: "Admin Users",
-      icon: Users,
+      icon: UserRoundCog,
       roles: ["System Administrator", "Head Office Manager"],
     },
     {
       id: "drivers",
       label: "Drivers",
-      icon: Users,
+      icon: UserRoundPen,
       roles: [
         "System Administrator",
         "Logistics Officer",
@@ -144,7 +149,7 @@ export function Sidebar({
     {
       id: "account",
       label: "My Account",
-      icon: Users,
+      icon: User,
       roles: [
         "System Administrator",
         "RDC Staff",
