@@ -47,12 +47,18 @@ const errorHandler = (
     // Prisma record not found
     statusCode = 404;
     message = "Record not found";
+  } else if (process.env.NODE_ENV === "development") {
+    // In development, show the actual error message
+    message = err.message || "Internal server error";
   }
 
   res.status(statusCode).json({
     success: false,
     message: message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    ...(process.env.NODE_ENV === "development" && {
+      stack: err.stack,
+      error: err.message,
+    }),
   });
 };
 

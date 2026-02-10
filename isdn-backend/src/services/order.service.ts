@@ -72,6 +72,30 @@ class OrderService {
     return await orderRepository.findByStatus(status);
   }
 
+  async getOrdersByDriverId(driverId: string | number): Promise<Order[]> {
+    // Verify driver exists and has Driver role
+    const driver = await prisma.user.findUnique({
+      where: { id: BigInt(driverId) },
+      include: {
+        role: true,
+      },
+    });
+
+    if (!driver) {
+      throw new Error("Driver not found");
+    }
+
+    if (!driver.active) {
+      throw new Error("Driver is not active");
+    }
+    // Check if the user has a Driver role
+    if (driver.role.roleName !== "Driver") {
+      throw new Error("User is not a driver");
+    }
+
+    return await orderRepository.findByDriverId(driverId);
+  }
+
   async createOrder(orderData: CreateOrderDto): Promise<Order> {
     // Verify user exists
     const user = await prisma.user.findUnique({

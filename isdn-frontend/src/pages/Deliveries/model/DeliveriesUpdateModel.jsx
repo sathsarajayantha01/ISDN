@@ -1,13 +1,11 @@
 import { Modal } from "../../../components/feedback/Modal";
 import { Button } from "../../../components/ui/Button";
 import { Select } from "../../../components/ui/Select";
-import { Input } from "../../../components/ui/Input";
 import { useState, useEffect } from "react";
-import { Calendar, Package } from "lucide-react";
+import { Package } from "lucide-react";
 
-export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
+export function DeliveriesUpdateModel({ isOpen, onClose, order, onUpdate }) {
   const [status, setStatus] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const statusOptions = [
@@ -23,19 +21,6 @@ export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
   useEffect(() => {
     if (order) {
       setStatus(order.status || "");
-
-      // Format existing delivery date if it exists
-      if (order.deliveryDate && Object.keys(order.deliveryDate).length > 0) {
-        try {
-          const date = new Date(order.deliveryDate);
-          const formattedDate = date.toISOString().slice(0, 16);
-          setDeliveryDate(formattedDate);
-        } catch {
-          setDeliveryDate("");
-        }
-      } else {
-        setDeliveryDate("");
-      }
     }
   }, [order]);
 
@@ -44,15 +29,8 @@ export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
     setIsSubmitting(true);
 
     try {
-      // Format delivery date to ISO string if provided
-      let formattedDeliveryDate = null;
-      if (deliveryDate) {
-        formattedDeliveryDate = new Date(deliveryDate).toISOString();
-      }
-
       await onUpdate(order.id, {
         status,
-        deliveryDate: formattedDeliveryDate,
       });
 
       onClose();
@@ -87,23 +65,6 @@ export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
           />
         </div>
 
-        {/* Delivery Date */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            <Calendar className="h-4 w-4 inline mr-1" />
-            Delivery Date & Time
-          </label>
-          <Input
-            type="datetime-local"
-            value={deliveryDate}
-            onChange={(e) => setDeliveryDate(e.target.value)}
-            required
-          />
-          <p className="text-xs text-slate-500 mt-1">
-            Select the expected delivery date and time
-          </p>
-        </div>
-
         {/* Order Summary */}
         <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
           <p className="text-xs font-medium text-slate-600 mb-1">
@@ -111,9 +72,9 @@ export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
           </p>
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-slate-600">Branch:</span>
+              <span className="text-slate-600">Order #:</span>
               <span className="font-medium text-slate-900">
-                {order.branch?.name || "N/A"}
+                {order.orderNumber}
               </span>
             </div>
             <div className="flex justify-between">
@@ -121,6 +82,10 @@ export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
               <span className="font-medium text-slate-900">
                 ${parseFloat(order.totalAmount || 0).toFixed(2)}
               </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">Current Status:</span>
+              <span className="font-medium text-slate-900">{order.status}</span>
             </div>
           </div>
         </div>
@@ -136,7 +101,7 @@ export function OrderUpdateModel({ isOpen, onClose, order, onUpdate }) {
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Updating..." : "Update Order"}
+            {isSubmitting ? "Updating..." : "Update Status"}
           </Button>
         </div>
       </form>

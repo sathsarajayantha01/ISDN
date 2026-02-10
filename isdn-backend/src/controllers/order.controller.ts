@@ -95,6 +95,33 @@ class OrderController {
     }
   }
 
+  async getOrdersByDriverId(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { driverId } = req.query;
+
+      if (!driverId) {
+        res.status(400).json({
+          success: false,
+          message: "Driver ID is required",
+        });
+        return;
+      }
+
+      const orders = await orderService.getOrdersByDriverId(driverId as string);
+      res.json({
+        success: true,
+        data: serializeBigInt(orders),
+        message: "Orders retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createOrder(
     req: Request,
     res: Response,

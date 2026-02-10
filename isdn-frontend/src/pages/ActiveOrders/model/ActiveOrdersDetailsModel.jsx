@@ -3,7 +3,7 @@ import { Modal } from "../../../components/feedback/Modal";
 import { Card } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
 
-export function OrderDetailsModel({ isOpen, onClose, order }) {
+export function ActiveOrdersDetailsModel({ isOpen, onClose, order }) {
   if (!order) return null;
 
   const formatDate = (dateObj) => {

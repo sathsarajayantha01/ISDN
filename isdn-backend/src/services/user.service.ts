@@ -48,6 +48,11 @@ class UserService {
     return user;
   }
 
+  async getUsersByRoleName(roleName: string): Promise<User[]> {
+    const users = await userRepository.findByRoleName(roleName);
+    return users;
+  }
+
   async createUser(userData: CreateUserDto): Promise<User> {
     // Check if user with email already exists
     const existingUserByEmail = await userRepository.findByEmail(

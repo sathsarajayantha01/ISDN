@@ -23,6 +23,16 @@ class OrderRepository {
             region: true,
           },
         },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
         items: {
           include: {
             product: {
@@ -31,6 +41,27 @@ class OrderRepository {
                 productCode: true,
                 name: true,
                 unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
               },
             },
           },
@@ -69,6 +100,16 @@ class OrderRepository {
             contactNumber: true,
           },
         },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
         items: {
           include: {
             product: {
@@ -78,6 +119,27 @@ class OrderRepository {
                 name: true,
                 unitType: true,
                 categoryId: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
               },
             },
           },
@@ -110,6 +172,16 @@ class OrderRepository {
             code: true,
           },
         },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
         items: {
           include: {
             product: {
@@ -118,6 +190,27 @@ class OrderRepository {
                 productCode: true,
                 name: true,
                 unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
               },
             },
           },
@@ -142,6 +235,16 @@ class OrderRepository {
             customerCode: true,
           },
         },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
         items: {
           include: {
             product: {
@@ -150,6 +253,27 @@ class OrderRepository {
                 productCode: true,
                 name: true,
                 unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
               },
             },
           },
@@ -180,6 +304,16 @@ class OrderRepository {
             code: true,
           },
         },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
         items: {
           include: {
             product: {
@@ -188,6 +322,27 @@ class OrderRepository {
                 productCode: true,
                 name: true,
                 unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
               },
             },
           },
@@ -310,6 +465,16 @@ class OrderRepository {
             code: true,
           },
         },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
         items: {
           include: {
             product: {
@@ -318,6 +483,27 @@ class OrderRepository {
                 productCode: true,
                 name: true,
                 unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
               },
             },
           },
@@ -373,10 +559,105 @@ class OrderRepository {
             },
           },
         },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
+              },
+            },
+          },
+        },
       },
     });
 
     return order;
+  }
+
+  async findByDriverId(driverId: string | number): Promise<Order[]> {
+    // Verify driver exists and has Driver role
+    const driver = await prisma.user.findUnique({
+      where: { id: BigInt(driverId) },
+      include: {
+        role: true,
+      },
+    });
+
+    if (!driver) {
+      throw new Error("Driver not found");
+    }
+
+    if (!driver.active) {
+      throw new Error("Driver is not active");
+    }
+
+    // Check if the user has a Driver role
+    if (driver.role.roleName !== "Driver") {
+      throw new Error("User is not a driver");
+    }
+
+    return await prisma.order.findMany({
+      where: { driverId: BigInt(driverId) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            businessName: true,
+            customerCode: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                productCode: true,
+                name: true,
+                unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   }
 
   async updateLocation(

@@ -135,6 +135,22 @@ class UserRepository {
     });
     return role?.roleName || null;
   }
+
+  async findByRoleName(roleName: string): Promise<User[]> {
+    return await prisma.user.findMany({
+      where: {
+        role: {
+          roleName,
+        },
+      },
+      include: {
+        role: true,
+        branch: true,
+        assignedBranch: true,
+        vehicle: true,
+      },
+    });
+  }
 }
 
 export default new UserRepository();

@@ -46,6 +46,11 @@ export function serializeBigInt<T>(obj: T): any {
     return obj.map(serializeBigInt);
   }
 
+  // Handle Date objects
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
   if (typeof obj === "object") {
     const serialized: any = {};
     for (const [key, value] of Object.entries(obj)) {

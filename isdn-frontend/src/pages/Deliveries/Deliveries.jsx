@@ -5,13 +5,13 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import { Card } from "../../components/ui/Card";
-import { Search, Download, Filter, AlertCircle, Eye, Edit } from "lucide-react";
+import { Search, Filter, AlertCircle, Eye, Edit } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { useToast } from "../../hooks/useToast";
-import { OrderDetailsModel } from "./model/OrderDetailsModel";
-import { OrderUpdateModel } from "./model/OrderUpdateModel";
+import { DeliveriesDetailsModel } from "./model/DeliveriesDetailsModel";
+import { DeliveriesUpdateModel } from "./model/DeliveriesUpdateModel";
 
-export function OrdersManage() {
+export function Deliveries() {
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -23,20 +23,35 @@ export function OrdersManage() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const { addToast } = useToast();
 
+  // Check if user is a Driver
+  const userRole = localStorage.getItem("userRole");
+
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (userRole === "Driver") {
+      fetchOrders();
+    }
+  }, [userRole]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get userId from localStorage
-      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      const userId = userInfo.id || "2";
+      // Get user info from localStorage
+      const userStr = localStorage.getItem("user");
+      const storedUser = userStr ? JSON.parse(userStr) : null;
+      const userId = storedUser?.id;
 
-      const response = await apiAdapter.get("/orders");
+      if (!userId) {
+        setError("User information not found");
+        addToast("error", "User information not found");
+        return;
+      }
+
+      // Get orders for the logged-in driver
+      const response = await apiAdapter.get(
+        `/orders/driver?driverId=${userId}`,
+      );
 
       if (response.success) {
         setOrders(response.data);
@@ -66,7 +81,7 @@ export function OrdersManage() {
       );
 
       if (response.success) {
-        addToast("success", "Order updated successfully");
+        addToast("success", "Order status updated successfully");
         await fetchOrders(); // Refresh the orders list
       } else {
         addToast("error", response.message || "Failed to update order");
@@ -80,17 +95,6 @@ export function OrdersManage() {
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
     setIsDetailsModalOpen(true);
-  };
-
-  const handleDeleteOrder = (order) => {
-    if (confirm(`Cancel order ${order.orderNumber}?`)) {
-      setOrders(
-        orders.map((o) =>
-          o.id === order.id ? { ...o, status: "Cancelled" } : o,
-        ),
-      );
-      addToast("info", "Order cancelled");
-    }
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -122,18 +126,28 @@ export function OrdersManage() {
     }
   };
 
+  // Role-based access control
+  if (userRole !== "Driver") {
+    return (
+      <div className="p-4 md:p-6">
+        <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <AlertCircle className="h-5 w-5 text-amber-600" />
+          <div>
+            <p className="font-semibold text-amber-900">Access Denied</p>
+            <p className="text-sm text-amber-800">
+              This page is only accessible to drivers.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const columns = [
     {
       key: "orderNumber",
       header: "Order #",
       sortable: true,
-    },
-    {
-      key: "branch",
-      header: "Branch",
-      sortable: true,
-      hideOnMobile: true,
-      render: (val) => val?.name || "N/A",
     },
     {
       key: "items",
@@ -168,23 +182,21 @@ export function OrdersManage() {
       key: "actions",
       header: "Actions",
       render: (val, row) => (
-        <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
+        <div className="flex gap-2">
+          <button
             onClick={() => handleViewDetails(row)}
-            leftIcon={<Eye className="h-4 w-4" />}
+            className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group"
+            title="View Details"
           >
-            View
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
+            <Eye className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+          </button>
+          <button
             onClick={() => handleUpdateStatus(row)}
-            leftIcon={<Edit className="h-4 w-4" />}
+            className="p-1.5 hover:bg-amber-50 rounded-lg transition-colors group"
+            title="Edit Status"
           >
-            Edit
-          </Button>
+            <Edit className="h-4 w-4 text-amber-600 group-hover:text-amber-700" />
+          </button>
         </div>
       ),
     },
@@ -196,7 +208,7 @@ export function OrdersManage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-slate-600">Loading orders...</p>
+            <p className="mt-4 text-slate-600">Loading deliveries...</p>
           </div>
         </div>
       </div>
@@ -210,7 +222,7 @@ export function OrdersManage() {
           <div className="flex items-center gap-3 text-red-800">
             <AlertCircle className="h-5 w-5" />
             <div>
-              <h3 className="font-semibold">Error Loading Orders</h3>
+              <h3 className="font-semibold">Error Loading Deliveries</h3>
               <p className="text-sm text-red-600">{error}</p>
             </div>
           </div>
@@ -228,19 +240,12 @@ export function OrdersManage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            My Orders
+            My Deliveries
           </h1>
           <p className="text-slate-500 mt-1 text-sm hidden sm:block">
-            View and track your order history.
+            View and manage your assigned delivery orders
           </p>
         </div>
-        <Button
-          variant="secondary"
-          leftIcon={<Download className="h-4 w-4" />}
-          className="w-full sm:w-auto"
-        >
-          Export
-        </Button>
       </div>
 
       {/* Filters */}
@@ -267,7 +272,10 @@ export function OrdersManage() {
             options={[
               { value: "all", label: "All Statuses" },
               { value: "pending", label: "Pending" },
+              { value: "confirmed", label: "Confirmed" },
               { value: "processing", label: "Processing" },
+              { value: "ready", label: "Ready" },
+              { value: "dispatched", label: "Dispatched" },
               { value: "delivered", label: "Delivered" },
               { value: "cancelled", label: "Cancelled" },
             ]}
@@ -279,20 +287,20 @@ export function OrdersManage() {
 
       {/* Results count */}
       <p className="text-xs sm:text-sm text-slate-500">
-        Showing {filteredOrders.length} of {orders.length} orders
+        Showing {filteredOrders.length} of {orders.length} deliveries
       </p>
 
       <DataTable data={filteredOrders} columns={columns} keyField="id" />
 
-      {/* Order Details Modal */}
-      <OrderDetailsModel
+      {/* Delivery Details Modal */}
+      <DeliveriesDetailsModel
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
         order={selectedOrder}
       />
 
-      {/* Order Update Modal */}
-      <OrderUpdateModel
+      {/* Delivery Status Update Modal */}
+      <DeliveriesUpdateModel
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
         order={selectedOrder}
