@@ -253,6 +253,29 @@ class OrderService {
 
     return updatedOrder;
   }
+
+  async getOrdersByStatusList(statusList: string[]): Promise<Order[]> {
+    const validStatuses = [
+      "Pending",
+      "Confirmed",
+      "Processing",
+      "Ready",
+      "Dispatched",
+      "Delivered",
+      "Cancelled",
+    ];
+
+    // Validate all statuses in the list
+    for (const status of statusList) {
+      if (!validStatuses.includes(status)) {
+        throw new Error(
+          `Invalid status '${status}' in status list. Valid statuses are: ${validStatuses.join(", ")}`,
+        );
+      }
+    }
+
+    return await orderRepository.findByStatusList(statusList);
+  }
 }
 
 export default new OrderService();

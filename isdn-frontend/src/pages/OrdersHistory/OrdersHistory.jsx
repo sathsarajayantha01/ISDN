@@ -5,10 +5,18 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import { Card } from "../../components/ui/Card";
-import { Search, Download, Filter, AlertCircle, Eye } from "lucide-react";
+import {
+  Search,
+  Download,
+  Filter,
+  AlertCircle,
+  Eye,
+  MapPin,
+} from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { useToast } from "../../hooks/useToast";
 import { OrderDetailsModel } from "./model/OrderDetailsModel";
+import { LocationViewModal } from "../../components/feedback/LocationViewModal";
 
 export function OrdersHistory() {
   const [orders, setOrders] = useState([]);
@@ -19,6 +27,7 @@ export function OrdersHistory() {
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -69,6 +78,11 @@ export function OrdersHistory() {
       );
       addToast("info", "Order cancelled");
     }
+  };
+
+  const handleViewLocation = (order) => {
+    setSelectedOrder(order);
+    setIsLocationModalOpen(true);
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -146,14 +160,22 @@ export function OrdersHistory() {
       key: "actions",
       header: "Actions",
       render: (val, row) => (
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => handleViewDetails(row)}
-          leftIcon={<Eye className="h-4 w-4" />}
-        >
-          View
-        </Button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleViewDetails(row)}
+            className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group"
+            title="View Details"
+          >
+            <Eye className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+          </button>
+          <button
+            onClick={() => handleViewLocation(row)}
+            className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group"
+            title="View Location"
+          >
+            <MapPin className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
+          </button>
+        </div>
       ),
     },
   ];
@@ -256,6 +278,13 @@ export function OrdersHistory() {
       <OrderDetailsModel
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
+        order={selectedOrder}
+      />
+
+      {/* Location View Modal */}
+      <LocationViewModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
         order={selectedOrder}
       />
     </div>

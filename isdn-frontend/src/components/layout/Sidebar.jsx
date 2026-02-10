@@ -97,6 +97,17 @@ export function Sidebar({
       ],
     },
     {
+      id: "delivered-orders",
+      label: "Delivered Orders",
+      icon: ShoppingCart,
+      roles: [
+        "System Administrator",
+        "RDC Staff",
+        "Logistics Officer",
+        "Head Office Manager",
+      ],
+    },
+    {
       id: "orders-history",
       label: "Orders History",
       icon: FileText,
@@ -106,18 +117,13 @@ export function Sidebar({
       id: "deliveries",
       label: "Deliveries",
       icon: Truck,
-      roles: [
-        "System Administrator",
-        "Logistics Officer",
-        "Driver",
-        "Head Office Manager",
-      ],
+      roles: ["System Administrator", "Driver"],
     },
     {
       id: "adminUsers",
       label: "Admin Users",
       icon: Users,
-      roles: ["System Administrator"],
+      roles: ["System Administrator", "Head Office Manager"],
     },
     {
       id: "drivers",

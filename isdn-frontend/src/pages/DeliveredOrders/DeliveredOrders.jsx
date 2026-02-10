@@ -5,14 +5,20 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import { Card } from "../../components/ui/Card";
-import { Search, Filter, AlertCircle, Eye, Edit, MapPin } from "lucide-react";
+import {
+  Search,
+  Download,
+  Filter,
+  AlertCircle,
+  Eye,
+  MapPin,
+} from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { useToast } from "../../hooks/useToast";
-import { DeliveriesDetailsModel } from "./model/DeliveriesDetailsModel";
-import { DeliveriesUpdateModel } from "./model/DeliveriesUpdateModel";
-import { DeliveriesLocationUpdateModel } from "./model/DeliveriesLocationUpdateModel";
+import { ActiveOrdersDetailsModel } from "./model/ActiveOrdersDetailsModel";
+import { LocationViewModal } from "../../components/feedback/LocationViewModal";
 
-export function Deliveries() {
+export function DeliveredOrders() {
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -21,38 +27,37 @@ export function Deliveries() {
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const { addToast } = useToast();
 
-  // Check if user is a Driver
-  const userRole = localStorage.getItem("userRole");
-
   useEffect(() => {
-    if (userRole === "Driver") {
-      fetchOrders();
-    }
-  }, [userRole]);
+    fetchOrders();
+  }, []);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get user info from localStorage
+      // Get user info and branch ID from localStorage
       const userStr = localStorage.getItem("user");
       const storedUser = userStr ? JSON.parse(userStr) : null;
-      const userId = storedUser?.id;
+      const branchId = storedUser?.branch?.id;
 
-      if (!userId) {
-        setError("User information not found");
-        addToast("error", "User information not found");
-        return;
+      // Define delivered order statuses
+      const statuses = ["Delivered", "Cancelled"];
+      const statusQuery = statuses.join(",");
+
+      // Build query params
+      const params = new URLSearchParams();
+      params.append("status", statusQuery);
+      if (branchId) {
+        params.append("branchId", branchId);
       }
 
-      // Get orders for the logged-in driver
+      // get orders with delivered/cancelled statuses for selected branch
       const response = await apiAdapter.get(
-        `/orders/driver?driverId=${userId}`,
+        `/orders/status?${params.toString()}`,
       );
 
       if (response.success) {
@@ -69,58 +74,14 @@ export function Deliveries() {
       setLoading(false);
     }
   };
-
-  const handleUpdateStatus = (order) => {
-    setSelectedOrder(order);
-    setIsUpdateModalOpen(true);
-  };
-
-  const handleUpdateOrder = async (orderId, updateData) => {
-    try {
-      const response = await apiAdapter.put(
-        `/orders/status/${orderId}`,
-        updateData,
-      );
-
-      if (response.success) {
-        addToast("success", "Order status updated successfully");
-        await fetchOrders(); // Refresh the orders list
-      } else {
-        addToast("error", response.message || "Failed to update order");
-      }
-    } catch (err) {
-      addToast("error", "An error occurred while updating the order");
-      console.error("Error updating order:", err);
-    }
-  };
-
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
     setIsDetailsModalOpen(true);
   };
 
-  const handleUpdateLocation = (order) => {
+  const handleViewLocation = (order) => {
     setSelectedOrder(order);
     setIsLocationModalOpen(true);
-  };
-
-  const handleLocationUpdate = async (orderId, locationData) => {
-    try {
-      const response = await apiAdapter.put(
-        `/orders/location/${orderId}`,
-        locationData,
-      );
-
-      if (response.success) {
-        addToast("success", "Location updated successfully");
-        await fetchOrders(); // Refresh the orders list
-      } else {
-        addToast("error", response.message || "Failed to update location");
-      }
-    } catch (err) {
-      addToast("error", "An error occurred while updating location");
-      console.error("Error updating location:", err);
-    }
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -151,23 +112,6 @@ export function Deliveries() {
       return "N/A";
     }
   };
-
-  // Role-based access control
-  if (userRole !== "Driver") {
-    return (
-      <div className="p-4 md:p-6">
-        <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <AlertCircle className="h-5 w-5 text-amber-600" />
-          <div>
-            <p className="font-semibold text-amber-900">Access Denied</p>
-            <p className="text-sm text-amber-800">
-              This page is only accessible to drivers.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const columns = [
     {
@@ -200,14 +144,16 @@ export function Deliveries() {
       render: (val) => formatDate(val),
     },
     {
-      key: "address",
-      header: "Address",
+      key: "driverId",
+      header: "Driver",
       sortable: true,
-    },
-    {
-      key: "contactNumber",
-      header: "Contact",
-      sortable: true,
+      hideOnMobile: true,
+      render: (val) =>
+        val ? (
+          <Badge status="assigned">Driver #{val}</Badge>
+        ) : (
+          <Badge status="pending">Not Assigned</Badge>
+        ),
     },
     {
       key: "status",
@@ -227,18 +173,11 @@ export function Deliveries() {
             <Eye className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
           </button>
           <button
-            onClick={() => handleUpdateStatus(row)}
-            className="p-1.5 hover:bg-amber-50 rounded-lg transition-colors group"
-            title="Edit Status"
+            onClick={() => handleViewLocation(row)}
+            className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group"
+            title="View Location"
           >
-            <Edit className="h-4 w-4 text-amber-600 group-hover:text-amber-700" />
-          </button>
-          <button
-            onClick={() => handleUpdateLocation(row)}
-            className="p-1.5 hover:bg-green-50 rounded-lg transition-colors group"
-            title="Update Location"
-          >
-            <MapPin className="h-4 w-4 text-green-600 group-hover:text-green-700" />
+            <MapPin className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
           </button>
         </div>
       ),
@@ -251,7 +190,7 @@ export function Deliveries() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-slate-600">Loading deliveries...</p>
+            <p className="mt-4 text-slate-600">Loading orders...</p>
           </div>
         </div>
       </div>
@@ -265,7 +204,7 @@ export function Deliveries() {
           <div className="flex items-center gap-3 text-red-800">
             <AlertCircle className="h-5 w-5" />
             <div>
-              <h3 className="font-semibold">Error Loading Deliveries</h3>
+              <h3 className="font-semibold">Error Loading Orders</h3>
               <p className="text-sm text-red-600">{error}</p>
             </div>
           </div>
@@ -283,12 +222,19 @@ export function Deliveries() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            My Deliveries
+            My Orders
           </h1>
           <p className="text-slate-500 mt-1 text-sm hidden sm:block">
-            View and manage your assigned delivery orders
+            View and track your order history.
           </p>
         </div>
+        <Button
+          variant="secondary"
+          leftIcon={<Download className="h-4 w-4" />}
+          className="w-full sm:w-auto"
+        >
+          Export
+        </Button>
       </div>
 
       {/* Filters */}
@@ -315,10 +261,7 @@ export function Deliveries() {
             options={[
               { value: "all", label: "All Statuses" },
               { value: "pending", label: "Pending" },
-              { value: "confirmed", label: "Confirmed" },
               { value: "processing", label: "Processing" },
-              { value: "ready", label: "Ready" },
-              { value: "dispatched", label: "Dispatched" },
               { value: "delivered", label: "Delivered" },
               { value: "cancelled", label: "Cancelled" },
             ]}
@@ -330,32 +273,23 @@ export function Deliveries() {
 
       {/* Results count */}
       <p className="text-xs sm:text-sm text-slate-500">
-        Showing {filteredOrders.length} of {orders.length} deliveries
+        Showing {filteredOrders.length} of {orders.length} orders
       </p>
 
       <DataTable data={filteredOrders} columns={columns} keyField="id" />
 
-      {/* Delivery Details Modal */}
-      <DeliveriesDetailsModel
+      {/* Order Details Modal */}
+      <ActiveOrdersDetailsModel
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
         order={selectedOrder}
       />
 
-      {/* Delivery Status Update Modal */}
-      <DeliveriesUpdateModel
-        isOpen={isUpdateModalOpen}
-        onClose={() => setIsUpdateModalOpen(false)}
-        order={selectedOrder}
-        onUpdate={handleUpdateOrder}
-      />
-
-      {/* Delivery Location Update Modal */}
-      <DeliveriesLocationUpdateModel
+      {/* Location View Modal */}
+      <LocationViewModal
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}
         order={selectedOrder}
-        onUpdate={handleLocationUpdate}
       />
     </div>
   );
