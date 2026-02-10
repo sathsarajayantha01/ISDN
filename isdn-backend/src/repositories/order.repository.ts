@@ -732,6 +732,76 @@ class OrderRepository {
 
     return `${datePrefix}${String(sequence).padStart(4, "0")}`;
   }
+
+  async findByStatusList(statusList: string[]): Promise<Order[]> {
+    return await prisma.order.findMany({
+      where: { status: { in: statusList } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            businessName: true,
+            customerCode: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            contactNumber: true,
+            licenseNumber: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                productCode: true,
+                name: true,
+                unitType: true,
+              },
+            },
+          },
+        },
+        deliveries: {
+          include: {
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                contactNumber: true,
+                licenseNumber: true,
+              },
+            },
+            vehicle: {
+              select: {
+                id: true,
+                vehicleNumber: true,
+                vehicleType: true,
+                brand: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
 }
 
 export default new OrderRepository();

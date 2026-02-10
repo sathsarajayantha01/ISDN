@@ -19,12 +19,19 @@ export function Users() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const allowedRoles = [
+    "RDC Staff",
+    "Logistics Officer",
+    "Head Office Manager",
+  ];
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+    const matchesRole = allowedRoles.includes(user.role?.roleName);
+    return matchesSearch && matchesRole;
   });
 
   const columns = [

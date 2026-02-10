@@ -13,12 +13,14 @@ import {
   Eye,
   Edit,
   UserPlus,
+  MapPin,
 } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { useToast } from "../../hooks/useToast";
 import { ActiveOrdersDetailsModel } from "./model/ActiveOrdersDetailsModel";
 import { ActiveOrdersUpdateModel } from "./model/ActiveOrdersUpdateModel";
 import { ActiveOrdersAssignDriverModel } from "./model/ActiveOrdersAssignDriverModel";
+import { LocationViewModal } from "../../components/feedback/LocationViewModal";
 
 export function ActiveOrders() {
   const [orders, setOrders] = useState([]);
@@ -31,6 +33,7 @@ export function ActiveOrders() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isAssignDriverModalOpen, setIsAssignDriverModalOpen] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -47,8 +50,27 @@ export function ActiveOrders() {
       const storedUser = userStr ? JSON.parse(userStr) : null;
       const branchId = storedUser?.branch?.id;
 
-      // get orders for selected branch
-      const response = await apiAdapter.get(`/orders?branchId=${branchId}`);
+      // Define active order statuses
+      const statuses = [
+        "Pending",
+        "Confirmed",
+        "Processing",
+        "Ready",
+        "Dispatched",
+      ];
+      const statusQuery = statuses.join(",");
+
+      // Build query params
+      const params = new URLSearchParams();
+      params.append("status", statusQuery);
+      if (branchId) {
+        params.append("branchId", branchId);
+      }
+
+      // get orders with active statuses for selected branch
+      const response = await apiAdapter.get(
+        `/orders/status?${params.toString()}`,
+      );
 
       if (response.success) {
         setOrders(response.data);
@@ -127,6 +149,11 @@ export function ActiveOrders() {
       addToast("error", "An error occurred while assigning the driver");
       console.error("Error assigning driver:", err);
     }
+  };
+
+  const handleViewLocation = (order) => {
+    setSelectedOrder(order);
+    setIsLocationModalOpen(true);
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -230,6 +257,13 @@ export function ActiveOrders() {
             title="Assign Driver"
           >
             <UserPlus className="h-4 w-4 text-green-600 group-hover:text-green-700" />
+          </button>
+          <button
+            onClick={() => handleViewLocation(row)}
+            className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group"
+            title="View Location"
+          >
+            <MapPin className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
           </button>
         </div>
       ),
@@ -351,6 +385,13 @@ export function ActiveOrders() {
         onClose={() => setIsAssignDriverModalOpen(false)}
         order={selectedOrder}
         onAssign={handleDriverAssignment}
+      />
+
+      {/* Location View Modal */}
+      <LocationViewModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        order={selectedOrder}
       />
     </div>
   );

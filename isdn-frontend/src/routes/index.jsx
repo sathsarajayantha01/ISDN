@@ -10,6 +10,7 @@ import { CustomerProduct } from "../pages/CustomerProduct/CustomerProduct";
 import { OrdersHistory } from "../pages/OrdersHistory/OrdersHistory";
 import { Account } from "../pages/Account/Account";
 import { Deliveries } from "../pages/Deliveries/Deliveries";
+import { DeliveredOrders } from "../pages/DeliveredOrders/DeliveredOrders";
 
 export const routes = [
   {
@@ -41,6 +42,11 @@ export const routes = [
     path: "active-orders",
     element: ActiveOrders,
     label: "Active Orders",
+  },
+  {
+    path: "delivered-orders",
+    element: DeliveredOrders,
+    label: "Delivered Orders",
   },
   {
     path: "orders-history",

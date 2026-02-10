@@ -20,6 +20,9 @@ router.get("/user/:userId", authenticate, orderController.getOrdersByUserId);
 // Get orders for specific driver using query param (must come before /:id)
 router.get("/driver", authenticate, orderController.getOrdersByDriverId);
 
+// Get orders by status List using query param (must come before /:id)
+router.get("/status", authenticate, orderController.getOrdersByStatusList);
+
 // Get order by ID (generic route, must come after specific routes)
 router.get("/:id", authenticate, orderController.getOrderById);
 

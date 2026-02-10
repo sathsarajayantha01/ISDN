@@ -215,10 +215,18 @@ export function UserUpdateModel({
             onChange={handleChange}
             options={[
               { value: "", label: "Select a role" },
-              ...roles.map((role) => ({
-                value: role.id,
-                label: role.roleName,
-              })),
+              ...roles
+                .filter((role) =>
+                  [
+                    "RDC Staff",
+                    "Logistics Officer",
+                    "Head Office Manager",
+                  ].includes(role.roleName),
+                )
+                .map((role) => ({
+                  value: role.id,
+                  label: role.roleName,
+                })),
             ]}
             error={errors.roleId}
           />

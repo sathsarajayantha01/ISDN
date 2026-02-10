@@ -122,6 +122,34 @@ class OrderController {
     }
   }
 
+  async getOrdersByStatusList(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { status } = req.query;
+      if (!status) {
+        res.status(400).json({
+          success: false,
+          message: "Status query parameter is required",
+        });
+        return;
+      }
+      const statusList = (status as string).split(",").map((s) => s.trim());
+      const orders = await orderService.getOrdersByStatusList(statusList);
+      res.json({
+        success: true,
+        data: serializeBigInt(orders),
+        message: "Orders retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+
+      return;
+    }
+  }
+
   async createOrder(
     req: Request,
     res: Response,
