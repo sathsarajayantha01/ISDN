@@ -17,11 +17,13 @@ model User {
   roleId             BigInt    @map("role_id")
   name               String
   contactNumber      String    @map("contact_number")
+  address            String?   @db.Text
+  latitude           Decimal?  @db.Decimal(10, 8)
+  longitude          Decimal?  @db.Decimal(11, 8)
   
   // Customer-specific
   businessName       String?   @map("business_name")
   customerCode       String?   @unique @map("customer_code")
-  address            String?   @db.Text
   district           String?
   customerType       String?   @map("customer_type") // Retail, Supermarket, Reseller
   assignedBranchId   BigInt?   @map("assigned_branch_id")

@@ -97,14 +97,14 @@ export function Inventory() {
           <div className="flex gap-2">
             <button
               onClick={() => handleUpdateQuantityClick(item)}
-              className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+              className="p-1 text-blue-800 hover:bg-blue-50 rounded hover:text-blue-600 transition-colors"
               title="Update Quantity"
             >
               <Edit2 className="h-4 w-4" />
             </button>
             <button
               onClick={() => handleTransferClick(item)}
-              className="p-1 text-green-600 hover:bg-green-50 rounded"
+              className="p-1 text-blue-800 hover:bg-green-50 rounded hover:text-green-600 transition-colors"
               title="Transfer Product"
             >
               <Send className="h-4 w-4" />

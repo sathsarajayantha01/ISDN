@@ -26,9 +26,32 @@ const getCurrentBranchId = () => {
   return localStorage.getItem("branchId");
 };
 
+// Helper function to get default page based on user role
+const getDefaultPageForRole = (role) => {
+  switch (role) {
+    case "Business Customer":
+    case "Retail Customer":
+      return "customer-products";
+    case "Driver":
+      return "deliveries";
+    case "System Administrator":
+    case "RDC Staff":
+    case "Logistics Officer":
+    case "Head Office Manager":
+    default:
+      return "dashboard";
+  }
+};
+
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] = useState(() => {
+    const user = getCurrentUser();
+    if (user?.role?.roleName) {
+      return getDefaultPageForRole(user.role.roleName);
+    }
+    return "dashboard";
+  });
   const [currentBranchId, setCurrentBranchId] = useState("1");
   const { addToast } = useToast();
 
@@ -77,6 +100,11 @@ function AppContent() {
 
     if (userBranchId) {
       setCurrentBranchId(userBranchId);
+    }
+
+    // Set the appropriate initial page based on user role
+    if (user?.role?.roleName) {
+      setActivePage(getDefaultPageForRole(user.role.roleName));
     }
 
     addToast(

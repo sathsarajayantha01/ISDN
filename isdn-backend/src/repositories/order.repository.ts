@@ -13,6 +13,8 @@ class OrderRepository {
             businessName: true,
             customerCode: true,
             customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -88,6 +90,8 @@ class OrderRepository {
             contactNumber: true,
             address: true,
             district: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -233,6 +237,9 @@ class OrderRepository {
             email: true,
             businessName: true,
             customerCode: true,
+            customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         driver: {
@@ -295,6 +302,10 @@ class OrderRepository {
             name: true,
             email: true,
             businessName: true,
+            customerCode: true,
+            customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -394,6 +405,8 @@ class OrderRepository {
               customerType: true,
               contactNumber: true,
               address: true,
+              latitude: true,
+              longitude: true,
               district: true,
             },
           },
@@ -456,6 +469,9 @@ class OrderRepository {
             email: true,
             businessName: true,
             customerCode: true,
+            customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -529,6 +545,9 @@ class OrderRepository {
             email: true,
             businessName: true,
             customerCode: true,
+            customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -618,6 +637,9 @@ class OrderRepository {
             email: true,
             businessName: true,
             customerCode: true,
+            customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -679,6 +701,11 @@ class OrderRepository {
             id: true,
             name: true,
             email: true,
+            businessName: true,
+            customerCode: true,
+            customerType: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {
@@ -744,6 +771,8 @@ class OrderRepository {
             email: true,
             businessName: true,
             customerCode: true,
+            latitude: true,
+            longitude: true,
           },
         },
         branch: {

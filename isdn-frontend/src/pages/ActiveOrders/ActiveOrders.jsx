@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataTable } from "../../components/data/DataTable";
+import { Status } from "../../components/ui/Status";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
@@ -249,28 +250,28 @@ export function ActiveOrders() {
         })}`,
     },
     {
-      key: "deliveryDate",
-      header: "Delivery",
-      sortable: true,
-      hideOnMobile: true,
-      render: (val) => formatDate(val),
-    },
-    {
       key: "driverId",
       header: "Driver",
       sortable: true,
       hideOnMobile: true,
       render: (val) =>
         val ? (
-          <Badge status="assigned">Driver #{val}</Badge>
+          <Status status="assigned">Driver #{val}</Status>
         ) : (
-          <Badge status="pending">Not Assigned</Badge>
+          <Status status="pending">Not Assigned</Status>
         ),
     },
     {
       key: "status",
       header: "Status",
       render: (val) => <Badge status={val.toLowerCase()} />,
+    },
+    {
+      key: "deliveryDate",
+      header: "Delivery",
+      sortable: true,
+      hideOnMobile: true,
+      render: (val) => formatDate(val),
     },
     {
       key: "actions",
@@ -282,28 +283,28 @@ export function ActiveOrders() {
             className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group"
             title="View Details"
           >
-            <Eye className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+            <Eye className="h-4 w-4 text-blue-800 hover:bg-blue-50 rounded hover:text-blue-600 transition-colors" />
           </button>
           <button
             onClick={() => handleUpdateStatus(row)}
             className="p-1.5 hover:bg-amber-50 rounded-lg transition-colors group"
             title="Edit Order"
           >
-            <Edit className="h-4 w-4 text-amber-600 group-hover:text-amber-700" />
+            <Edit className="h-4 w-4 text-blue-800 hover:bg-amber-50 rounded hover:text-amber-700 transition-colors" />
           </button>
           <button
             onClick={() => handleAssignDriver(row)}
             className="p-1.5 hover:bg-green-50 rounded-lg transition-colors group"
             title="Assign Driver"
           >
-            <UserPlus className="h-4 w-4 text-green-600 group-hover:text-green-700" />
+            <UserPlus className="h-4 w-4 text-blue-800 hover:bg-green-50 rounded hover:text-green-700 transition-colors" />
           </button>
           <button
             onClick={() => handleViewLocation(row)}
             className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group"
             title="View Location"
           >
-            <MapPin className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
+            <MapPin className="h-4 w-4 text-blue-800 hover:bg-purple-50 rounded hover:text-purple-700 transition-colors" />
           </button>
         </div>
       ),

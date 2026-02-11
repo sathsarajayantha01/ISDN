@@ -124,6 +124,8 @@ class UserService {
         branchId: userData.branchId,
         vehicleId: vehicle.id,
         licenseNumber: userData.licenseNumber || undefined,
+        latitude: userData.latitude,
+        longitude: userData.longitude,
       };
 
       return await userRepository.create(newUserData);
@@ -147,6 +149,8 @@ class UserService {
       assignedBranchId: userData.assignedBranchId,
       branchId: userData.branchId,
       licenseNumber: userData.licenseNumber || undefined,
+      latitude: userData.latitude,
+      longitude: userData.longitude,
     };
 
     return await userRepository.create(newUserData);
@@ -173,6 +177,16 @@ class UserService {
       );
       if (existingUser && existingUser.id !== BigInt(id)) {
         throw new Error("Username is already in use by another user");
+      }
+    }
+
+    // If customerCode is being updated, check if it's already in use by another user
+    if (userData.customerCode) {
+      const existingUser = await userRepository.findByCustomerCode(
+        userData.customerCode,
+      );
+      if (existingUser && existingUser.id !== BigInt(id)) {
+        throw new Error("Customer code is already in use by another user");
       }
     }
 
