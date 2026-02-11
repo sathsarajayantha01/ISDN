@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { DataTable } from "../../components/data/DataTable";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
-import { Plus, Search, Image } from "lucide-react";
+import { Plus, Search, Image, Download } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
+import { exportToPDF } from "../../utils/pdfExport";
 import { ProductCreateModel } from "./models/ProductCreateModel";
 import { ProductUpdateModel } from "./models/ProductUpdateModel";
 import { ProductImagesModal } from "./models/ProductImagesModal";
@@ -92,6 +93,32 @@ export function Product() {
         branchId: storedUser.branch?.id || null,
       });
     }
+  };
+
+  const handleExport = () => {
+    const exportColumns = [
+      { key: "productCode", header: "Product Code" },
+      { key: "name", header: "Name" },
+      {
+        key: "category",
+        header: "Category",
+        render: (val, item) => item.category?.name || "-",
+      },
+      { key: "unitPrice", header: "Unit Price", render: (val) => `$${val}` },
+      { key: "unitType", header: "Unit Type" },
+      {
+        key: "promotion",
+        header: "Promotion",
+        render: (val, item) => item.promotion?.title || "-",
+      },
+      { key: "description", header: "Description" },
+    ];
+    exportToPDF(
+      filteredProduct,
+      exportColumns,
+      "products-report",
+      "Products Report",
+    );
   };
 
   const fetchProduct = async () => {
@@ -231,13 +258,23 @@ export function Product() {
             Manage system products and their details.
           </p>
         </div>
-        <Button
-          onClick={() => setIsCreateModalOpen(true)}
-          leftIcon={<Plus className="h-4 w-4" />}
-          className="w-full sm:w-auto"
-        >
-          Add Product
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            leftIcon={<Download className="h-4 w-4" />}
+            className="w-full sm:w-auto"
+            onClick={handleExport}
+          >
+            Export
+          </Button>
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            leftIcon={<Plus className="h-4 w-4" />}
+            className="w-full sm:w-auto"
+          >
+            Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Search */}

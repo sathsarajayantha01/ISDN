@@ -15,6 +15,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
+import { exportToPDF } from "../../utils/pdfExport";
 import { ActiveOrdersDetailsModel } from "./model/ActiveOrdersDetailsModel";
 import { LocationViewModal } from "../../components/feedback/LocationViewModal";
 import { AlertModal } from "../../components/feedback/AlertModal";
@@ -95,6 +96,51 @@ export function DeliveredOrders() {
   const handleViewLocation = (order) => {
     setSelectedOrder(order);
     setIsLocationModalOpen(true);
+  };
+
+  const handleExport = () => {
+    const getItemsCount = (order) => {
+      return (
+        order.items?.reduce((sum, item) => sum + parseInt(item.quantity), 0) ||
+        0
+      );
+    };
+
+    const formatDate = (dateObj) => {
+      if (!dateObj || Object.keys(dateObj).length === 0) return "N/A";
+      try {
+        const date = new Date(dateObj);
+        return date.toLocaleDateString();
+      } catch {
+        return "N/A";
+      }
+    };
+
+    const exportColumns = [
+      { key: "orderNumber", header: "Order #" },
+      {
+        key: "items",
+        header: "Items",
+        render: (val, row) => `${getItemsCount(row)} item(s)`,
+      },
+      {
+        key: "totalAmount",
+        header: "Total",
+        render: (val) => `$${parseFloat(val || 0).toFixed(2)}`,
+      },
+      { key: "status", header: "Status" },
+      {
+        key: "deliveryDate",
+        header: "Delivery",
+        render: (val) => formatDate(val),
+      },
+    ];
+    exportToPDF(
+      filteredOrders,
+      exportColumns,
+      "delivered-orders-report",
+      "Delivered Orders Report",
+    );
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -245,6 +291,7 @@ export function DeliveredOrders() {
           variant="secondary"
           leftIcon={<Download className="h-4 w-4" />}
           className="w-full sm:w-auto"
+          onClick={handleExport}
         >
           Export
         </Button>

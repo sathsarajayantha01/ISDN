@@ -2,8 +2,18 @@ import { useState, useEffect } from "react";
 import { DataTable } from "../../components/data/DataTable";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
-import { Plus, Search, Edit2, Send, Check, X, Package } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit2,
+  Send,
+  Check,
+  X,
+  Package,
+  Download,
+} from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
+import { exportToPDF } from "../../utils/pdfExport";
 import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Inventory() {
@@ -239,6 +249,37 @@ export function Inventory() {
     setIsPendingTransferModalOpen(true);
   };
 
+  const handleExport = () => {
+    const exportColumns = [
+      { key: "productCode", header: "Product Code" },
+      { key: "name", header: "Name" },
+      {
+        key: "category",
+        header: "Category",
+        render: (val, item) => item.category?.name || "-",
+      },
+      { key: "unitPrice", header: "Unit Price", render: (val) => `$${val}` },
+      {
+        key: "stockQuantity",
+        header: "Stock Quantity",
+        render: (val, item) => item.inventories[0]?.quantity || "0",
+      },
+      { key: "unitType", header: "Unit Type" },
+      {
+        key: "promotion",
+        header: "Promotion",
+        render: (val, item) => item.promotion?.discountPercent || "-",
+      },
+      { key: "description", header: "Description" },
+    ];
+    exportToPDF(
+      filteredProduct,
+      exportColumns,
+      "inventory-report",
+      "Inventory Report",
+    );
+  };
+
   const handleUpdateQuantity = async () => {
     if (!updateQuantity || updateQuantity <= 0) {
       setAlertModal({
@@ -421,11 +462,12 @@ export function Inventory() {
           </p>
         </div>
         <Button
-          onClick={() => setIsUpdateQuantityModalOpen(false)}
-          leftIcon={<Plus className="h-4 w-4" />}
+          variant="secondary"
+          leftIcon={<Download className="h-4 w-4" />}
           className="w-full sm:w-auto"
+          onClick={handleExport}
         >
-          Add Product
+          Export
         </Button>
       </div>
 

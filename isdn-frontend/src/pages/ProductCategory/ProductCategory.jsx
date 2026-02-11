@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { DataTable } from "../../components/data/DataTable";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Download } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
+import { exportToPDF } from "../../utils/pdfExport";
 import { ProductCategoryCreateModel } from "./models/ProductCategoryCreateModel";
 import { ProductCategoryUpdateModel } from "./models/ProductCategoryUpdateModel";
 import { AlertModal } from "../../components/feedback/AlertModal";
@@ -61,6 +62,19 @@ export function ProductCategory() {
         branchId: storedUser.branch?.id || null,
       });
     }
+  };
+
+  const handleExport = () => {
+    const exportColumns = [
+      { key: "name", header: "Name" },
+      { key: "description", header: "Description" },
+    ];
+    exportToPDF(
+      filteredProductCategory,
+      exportColumns,
+      "product-categories-report",
+      "Product Categories Report",
+    );
   };
 
   const fetchProductCategory = async () => {
@@ -208,13 +222,23 @@ export function ProductCategory() {
             Manage system product categories and their details.
           </p>
         </div>
-        <Button
-          onClick={() => setIsCreateModalOpen(true)}
-          leftIcon={<Plus className="h-4 w-4" />}
-          className="w-full sm:w-auto"
-        >
-          Add Product Category
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            leftIcon={<Download className="h-4 w-4" />}
+            className="w-full sm:w-auto"
+            onClick={handleExport}
+          >
+            Export
+          </Button>
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            leftIcon={<Plus className="h-4 w-4" />}
+            className="w-full sm:w-auto"
+          >
+            Add Product Category
+          </Button>
+        </div>
       </div>
 
       {/* Search */}

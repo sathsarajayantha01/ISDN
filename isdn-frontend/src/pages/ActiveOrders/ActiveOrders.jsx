@@ -17,6 +17,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
+import { exportToPDF } from "../../utils/pdfExport";
 import { ActiveOrdersDetailsModel } from "./model/ActiveOrdersDetailsModel";
 import { ActiveOrdersUpdateModel } from "./model/ActiveOrdersUpdateModel";
 import { ActiveOrdersAssignDriverModel } from "./model/ActiveOrdersAssignDriverModel";
@@ -197,6 +198,39 @@ export function ActiveOrders() {
     setIsLocationModalOpen(true);
   };
 
+  const handleExport = () => {
+    const exportColumns = [
+      { key: "orderNumber", header: "Order #" },
+      {
+        key: "items",
+        header: "Items",
+        render: (val, row) => `${getItemsCount(row)} item(s)`,
+      },
+      {
+        key: "totalAmount",
+        header: "Total",
+        render: (val) => `$${parseFloat(val || 0).toFixed(2)}`,
+      },
+      {
+        key: "driverId",
+        header: "Driver",
+        render: (val) => (val ? `Driver #${val}` : "Not Assigned"),
+      },
+      { key: "status", header: "Status" },
+      {
+        key: "deliveryDate",
+        header: "Delivery",
+        render: (val) => formatDate(val),
+      },
+    ];
+    exportToPDF(
+      filteredOrders,
+      exportColumns,
+      "active-orders-report",
+      "Active Orders Report",
+    );
+  };
+
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -359,6 +393,7 @@ export function ActiveOrders() {
           variant="secondary"
           leftIcon={<Download className="h-4 w-4" />}
           className="w-full sm:w-auto"
+          onClick={handleExport}
         >
           Export
         </Button>

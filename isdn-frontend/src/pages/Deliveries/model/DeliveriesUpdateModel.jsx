@@ -9,18 +9,16 @@ export function DeliveriesUpdateModel({ isOpen, onClose, order, onUpdate }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const statusOptions = [
-    { value: "Pending", label: "Pending" },
-    { value: "Confirmed", label: "Confirmed" },
-    { value: "Processing", label: "Processing" },
-    { value: "Ready", label: "Ready" },
-    { value: "Dispatched", label: "Dispatched" },
     { value: "Delivered", label: "Delivered" },
     { value: "Cancelled", label: "Cancelled" },
   ];
 
   useEffect(() => {
     if (order) {
-      setStatus(order.status || "");
+      const validStatuses = ["Delivered", "Cancelled"];
+      const currentStatus = order.status || "";
+      // Only set status if it's one of the valid options, otherwise reset to empty
+      setStatus(validStatuses.includes(currentStatus) ? currentStatus : "");
     }
   }, [order]);
 
@@ -58,11 +56,17 @@ export function DeliveriesUpdateModel({ isOpen, onClose, order, onUpdate }) {
             Order Status
           </label>
           <Select
-            options={statusOptions}
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             required
-          />
+          >
+            <option value="">Select Status</option>
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
         </div>
 
         {/* Order Summary */}
