@@ -15,7 +15,7 @@ import { Input } from "../../components/ui/Input";
 import { CartDrawer } from "../../components/cart/CartDrawer";
 import { PaymentModal } from "../../components/cart/PaymentModal";
 import { apiAdapter } from "../../services/apiAdapter";
-import { useToast } from "../../hooks/useToast";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function CustomerProduct() {
   const [products, setProducts] = useState([]);
@@ -30,7 +30,11 @@ export function CustomerProduct() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [quantities, setQuantities] = useState({});
-  const { addToast } = useToast();
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -115,7 +119,11 @@ export function CustomerProduct() {
     const maxQuantity = product.inventories?.[0]?.quantity || 0;
 
     if (quantity > maxQuantity) {
-      addToast("error", "Not enough stock available");
+      setAlertModal({
+        isOpen: true,
+        message: "Not enough stock available",
+        isSuccess: false,
+      });
       return;
     }
 
@@ -133,10 +141,18 @@ export function CustomerProduct() {
               : item,
           ),
         );
-        addToast("success", `Added ${quantity} more to cart`);
+        setAlertModal({
+          isOpen: true,
+          message: `Added ${quantity} more to cart`,
+          isSuccess: true,
+        });
       } else {
         setCart([...cart, { ...product, quantity }]);
-        addToast("success", `${product.name} added to cart`);
+        setAlertModal({
+          isOpen: true,
+          message: `${product.name} added to cart`,
+          isSuccess: true,
+        });
       }
 
       // Reset quantity selector for this product
@@ -150,7 +166,11 @@ export function CustomerProduct() {
     const maxQuantity = product?.inventories?.[0]?.quantity || 99;
 
     if (newQuantity > maxQuantity) {
-      addToast("error", "Not enough stock available");
+      setAlertModal({
+        isOpen: true,
+        message: "Not enough stock available",
+        isSuccess: false,
+      });
       return;
     }
 
@@ -167,7 +187,11 @@ export function CustomerProduct() {
 
   const handleRemoveFromCart = (productId) => {
     setCart(cart.filter((item) => item.id !== productId));
-    addToast("info", "Item removed from cart");
+    setAlertModal({
+      isOpen: true,
+      message: "Item removed from cart",
+      isSuccess: true,
+    });
   };
 
   const handleCheckout = () => {
@@ -184,7 +208,11 @@ export function CustomerProduct() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        addToast("error", "Please login to place an order");
+        setAlertModal({
+          isOpen: true,
+          message: "Please login to place an order",
+          isSuccess: false,
+        });
         return;
       }
 
@@ -208,17 +236,29 @@ export function CustomerProduct() {
       const response = await apiAdapter.post("/orders", orderPayload);
 
       if (response.success) {
-        addToast("success", "Order placed successfully!");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Order placed successfully!",
+          isSuccess: true,
+        });
         // Clear cart
         setCart([]);
         localStorage.removeItem("customerCart");
         setIsPaymentModalOpen(false);
       } else {
-        addToast("error", response.message || "Failed to create order");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to create order",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      addToast("error", "An error occurred while creating the order");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while creating the order",
+        isSuccess: false,
+      });
     }
   };
 
@@ -592,6 +632,16 @@ export function CustomerProduct() {
         onClose={() => setIsPaymentModalOpen(false)}
         cart={cart}
         onConfirmOrder={handleConfirmOrder}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </>
   );

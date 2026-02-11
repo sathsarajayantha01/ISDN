@@ -7,6 +7,7 @@ import { Plus, Search } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { CustomersCreateModel } from "./models/CustomersCreateModel";
 import { CustomersUpdateModel } from "./models/CustomersUpdateModel";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -18,6 +19,11 @@ export function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   const filteredCustomers = customers.filter((customer) => {
     const matchesSearch =
@@ -174,9 +180,20 @@ export function Customers() {
 
       if (response.success && response.data) {
         setCustomers(response.data);
+      } else if (!response.success && response.message) {
+        setAlertModal({
+          isOpen: true,
+          message: response.message,
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch customers:", error);
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to fetch customers",
+        isSuccess: false,
+      });
     } finally {
       setLoading(false);
     }
@@ -209,11 +226,26 @@ export function Customers() {
       const response = await apiAdapter.post("/users/", customerData);
       if (response.success) {
         setIsCreateModalOpen(false);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Customer created successfully",
+          isSuccess: true,
+        });
         fetchCustomers();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to create customer",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to create customer:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to create customer",
+        isSuccess: false,
+      });
     }
   };
 
@@ -226,11 +258,26 @@ export function Customers() {
       if (response.success) {
         setIsUpdateModalOpen(false);
         setSelectedCustomer(null);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Customer updated successfully",
+          isSuccess: true,
+        });
         fetchCustomers();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update customer",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to update customer:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to update customer",
+        isSuccess: false,
+      });
     }
   };
 
@@ -244,10 +291,26 @@ export function Customers() {
       try {
         const response = await apiAdapter.delete(`/users/${customer.id}`);
         if (response.success) {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Customer deleted successfully",
+            isSuccess: true,
+          });
           fetchCustomers();
+        } else {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Failed to delete customer",
+            isSuccess: false,
+          });
         }
       } catch (error) {
         console.error("Failed to delete customer:", error);
+        setAlertModal({
+          isOpen: true,
+          message: error.message || "Failed to delete customer",
+          isSuccess: false,
+        });
       }
     }
   };
@@ -317,6 +380,16 @@ export function Customers() {
         customer={selectedCustomer}
         roles={roles}
         branches={branches}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );

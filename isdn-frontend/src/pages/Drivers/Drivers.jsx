@@ -7,6 +7,7 @@ import { Plus, Search } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { DriverCreateModel } from "./models/DriversCreateModel";
 import { DriverUpdateModel } from "./models/DriversUpdateModel";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Drivers() {
   const [drivers, setDrivers] = useState([]);
@@ -18,6 +19,11 @@ export function Drivers() {
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   const filteredDrivers = drivers.filter((driver) => {
     const matchesSearch =
@@ -117,9 +123,20 @@ export function Drivers() {
       });
       if (response.success && response.data) {
         setDrivers(response.data);
+      } else if (!response.success && response.message) {
+        setAlertModal({
+          isOpen: true,
+          message: response.message,
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch drivers:", error);
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to fetch drivers",
+        isSuccess: false,
+      });
     } finally {
       setLoading(false);
     }
@@ -152,11 +169,26 @@ export function Drivers() {
       const response = await apiAdapter.post("/users/", driverData);
       if (response.success) {
         setIsCreateModalOpen(false);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Driver created successfully",
+          isSuccess: true,
+        });
         fetchDrivers();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to create driver",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to create driver:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to create driver",
+        isSuccess: false,
+      });
     }
   };
 
@@ -166,11 +198,26 @@ export function Drivers() {
       if (response.success) {
         setIsUpdateModalOpen(false);
         setSelectedDriver(null);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Driver updated successfully",
+          isSuccess: true,
+        });
         fetchDrivers();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update driver",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to update driver:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to update driver",
+        isSuccess: false,
+      });
     }
   };
 
@@ -184,10 +231,26 @@ export function Drivers() {
       try {
         const response = await apiAdapter.delete(`/users/${driver.id}`);
         if (response.success) {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Driver deleted successfully",
+            isSuccess: true,
+          });
           fetchDrivers();
+        } else {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Failed to delete driver",
+            isSuccess: false,
+          });
         }
       } catch (error) {
         console.error("Failed to delete driver:", error);
+        setAlertModal({
+          isOpen: true,
+          message: error.message || "Failed to delete driver",
+          isSuccess: false,
+        });
       }
     }
   };
@@ -257,6 +320,16 @@ export function Drivers() {
         driver={selectedDriver}
         roles={roles}
         branches={branches}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );

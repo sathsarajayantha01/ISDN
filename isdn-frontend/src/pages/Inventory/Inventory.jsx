@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Plus, Search, Edit2, Send, Check, X, Package } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
-import { useToast } from "../../context/ToastContext";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Inventory() {
   const [product, setProduct] = useState([]);
@@ -13,6 +13,11 @@ export function Inventory() {
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState([]);
   const [pendingTransfers, setPendingTransfers] = useState([]);
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   // Modal states
   const [isUpdateQuantityModalOpen, setIsUpdateQuantityModalOpen] =
@@ -29,8 +34,6 @@ export function Inventory() {
   // Transfer form state
   const [transferBranchId, setTransferBranchId] = useState("");
   const [transferQuantity, setTransferQuantity] = useState("");
-
-  const { addToast } = useToast();
 
   const filteredProduct = product.filter((item) => {
     const matchesSearch =
@@ -238,7 +241,11 @@ export function Inventory() {
 
   const handleUpdateQuantity = async () => {
     if (!updateQuantity || updateQuantity <= 0) {
-      addToast("error", "Please enter a valid quantity");
+      setAlertModal({
+        isOpen: true,
+        message: "Please enter a valid quantity",
+        isSuccess: false,
+      });
       return;
     }
 
@@ -254,29 +261,46 @@ export function Inventory() {
       );
 
       if (response.success) {
-        addToast(
-          "success",
-          response.message || "Product quantity updated successfully",
-        );
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Product quantity updated successfully",
+          isSuccess: true,
+        });
         setIsUpdateQuantityModalOpen(false);
         fetchProduct();
       } else {
-        addToast("error", response.message || "Failed to update quantity");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update quantity",
+          isSuccess: false,
+        });
       }
     } catch (error) {
-      addToast("error", error.message || "Error updating quantity");
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Error updating quantity",
+        isSuccess: false,
+      });
       console.error("Update quantity error:", error);
     }
   };
 
   const handleTransferProduct = async () => {
     if (!transferBranchId) {
-      addToast("error", "Please select a destination branch");
+      setAlertModal({
+        isOpen: true,
+        message: "Please select a destination branch",
+        isSuccess: false,
+      });
       return;
     }
 
     if (!transferQuantity || transferQuantity <= 0) {
-      addToast("error", "Please enter a valid quantity");
+      setAlertModal({
+        isOpen: true,
+        message: "Please enter a valid quantity",
+        isSuccess: false,
+      });
       return;
     }
 
@@ -291,17 +315,27 @@ export function Inventory() {
       );
 
       if (response.success) {
-        addToast(
-          "success",
-          response.message || "Product transfer initiated successfully",
-        );
+        setAlertModal({
+          isOpen: true,
+          message:
+            response.message || "Product transfer initiated successfully",
+          isSuccess: true,
+        });
         setIsTransferModalOpen(false);
         fetchProduct();
       } else {
-        addToast("error", response.message || "Failed to transfer product");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to transfer product",
+          isSuccess: false,
+        });
       }
     } catch (error) {
-      addToast("error", error.message || "Error transferring product");
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Error transferring product",
+        isSuccess: false,
+      });
       console.error("Transfer product error:", error);
     }
   };
@@ -317,13 +351,25 @@ export function Inventory() {
       );
 
       if (response.success) {
-        addToast("success", response.message || "Transfer accepted");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Transfer accepted",
+          isSuccess: true,
+        });
         fetchProduct();
       } else {
-        addToast("error", response.message || "Failed to accept transfer");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to accept transfer",
+          isSuccess: false,
+        });
       }
     } catch (error) {
-      addToast("error", error.message || "Error accepting transfer");
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Error accepting transfer",
+        isSuccess: false,
+      });
       console.error("Accept transfer error:", error);
     }
   };
@@ -339,13 +385,25 @@ export function Inventory() {
       );
 
       if (response.success) {
-        addToast("success", response.message || "Transfer rejected");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Transfer rejected",
+          isSuccess: true,
+        });
         fetchProduct();
       } else {
-        addToast("error", response.message || "Failed to reject transfer");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to reject transfer",
+          isSuccess: false,
+        });
       }
     } catch (error) {
-      addToast("error", error.message || "Error rejecting transfer");
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Error rejecting transfer",
+        isSuccess: false,
+      });
       console.error("Reject transfer error:", error);
     }
   };
@@ -568,6 +626,16 @@ export function Inventory() {
           </div>
         </div>
       )}
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
+      />
     </div>
   );
 }

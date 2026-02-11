@@ -6,6 +6,7 @@ import { Plus, Search } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { ProductCategoryCreateModel } from "./models/ProductCategoryCreateModel";
 import { ProductCategoryUpdateModel } from "./models/ProductCategoryUpdateModel";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function ProductCategory() {
   const [productCategory, setProductCategory] = useState([]);
@@ -15,6 +16,11 @@ export function ProductCategory() {
   const [selectedProductCategory, setSelectedProductCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   const filteredProductCategory = productCategory.filter((category) => {
     const matchesSearch =
@@ -64,9 +70,20 @@ export function ProductCategory() {
       const response = await apiAdapter.get("/product-categories");
       if (response.success && response.data) {
         setProductCategory(response.data);
+      } else if (!response.success && response.message) {
+        setAlertModal({
+          isOpen: true,
+          message: response.message,
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch product categories:", error);
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to fetch product categories",
+        isSuccess: false,
+      });
     } finally {
       setLoading(false);
     }
@@ -80,11 +97,26 @@ export function ProductCategory() {
       );
       if (response.success) {
         setIsCreateModalOpen(false);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Product category created successfully",
+          isSuccess: true,
+        });
         fetchProductCategory();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to create product category",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to create product category:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to create product category",
+        isSuccess: false,
+      });
     }
   };
 
@@ -100,11 +132,26 @@ export function ProductCategory() {
       if (response.success) {
         setIsUpdateModalOpen(false);
         setSelectedProductCategory(null);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Product category updated successfully",
+          isSuccess: true,
+        });
         fetchProductCategory();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update product category",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to update product category:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to update product category",
+        isSuccess: false,
+      });
     }
   };
 
@@ -124,10 +171,27 @@ export function ProductCategory() {
           `/product-categories/${productCategory.id}`,
         );
         if (response.success) {
+          setAlertModal({
+            isOpen: true,
+            message:
+              response.message || "Product category deleted successfully",
+            isSuccess: true,
+          });
           fetchProductCategory();
+        } else {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Failed to delete product category",
+            isSuccess: false,
+          });
         }
       } catch (error) {
         console.error("Failed to delete product category:", error);
+        setAlertModal({
+          isOpen: true,
+          message: error.message || "Failed to delete product category",
+          isSuccess: false,
+        });
       }
     }
   };
@@ -194,6 +258,16 @@ export function ProductCategory() {
         }}
         onSubmit={handleUpdateProductCategory}
         productCategory={selectedProductCategory}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );

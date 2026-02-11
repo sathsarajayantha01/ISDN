@@ -7,6 +7,7 @@ import { apiAdapter } from "../../services/apiAdapter";
 import { ProductCreateModel } from "./models/ProductCreateModel";
 import { ProductUpdateModel } from "./models/ProductUpdateModel";
 import { ProductImagesModal } from "./models/ProductImagesModal";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Product() {
   const [product, setProduct] = useState([]);
@@ -17,6 +18,11 @@ export function Product() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   const filteredProduct = product.filter((item) => {
     const matchesSearch =
@@ -95,9 +101,20 @@ export function Product() {
       const response = await apiAdapter.get("/products");
       if (response.success && response.data) {
         setProduct(response.data);
+      } else if (!response.success && response.message) {
+        setAlertModal({
+          isOpen: true,
+          message: response.message,
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch products:", error);
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to fetch products",
+        isSuccess: false,
+      });
     } finally {
       setLoading(false);
     }
@@ -108,11 +125,26 @@ export function Product() {
       const response = await apiAdapter.post("/products/", productData);
       if (response.success) {
         setIsCreateModalOpen(false);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Product created successfully",
+          isSuccess: true,
+        });
         fetchProduct();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to create product",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to create product:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to create product",
+        isSuccess: false,
+      });
     }
   };
 
@@ -125,11 +157,26 @@ export function Product() {
       if (response.success) {
         setIsUpdateModalOpen(false);
         setSelectedProduct(null);
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Product updated successfully",
+          isSuccess: true,
+        });
         fetchProduct();
+      } else {
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update product",
+          isSuccess: false,
+        });
       }
     } catch (error) {
       console.error("Failed to update product:", error);
-      throw error;
+      setAlertModal({
+        isOpen: true,
+        message: error.message || "Failed to update product",
+        isSuccess: false,
+      });
     }
   };
 
@@ -148,10 +195,26 @@ export function Product() {
       try {
         const response = await apiAdapter.delete(`/products/${product.id}`);
         if (response.success) {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Product deleted successfully",
+            isSuccess: true,
+          });
           fetchProduct();
+        } else {
+          setAlertModal({
+            isOpen: true,
+            message: response.message || "Failed to delete product",
+            isSuccess: false,
+          });
         }
       } catch (error) {
         console.error("Failed to delete product:", error);
+        setAlertModal({
+          isOpen: true,
+          message: error.message || "Failed to delete product",
+          isSuccess: false,
+        });
       }
     }
   };
@@ -228,6 +291,16 @@ export function Product() {
           setSelectedProduct(null);
         }}
         product={selectedProduct}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );
