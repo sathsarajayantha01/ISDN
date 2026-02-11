@@ -44,6 +44,7 @@ router.put(
     "RDC Staff",
     "Branch Manager",
     "Sales Representative",
+    "Driver",
   ]),
   orderController.updateOrderStatus,
 );

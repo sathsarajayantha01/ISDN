@@ -13,8 +13,10 @@ import {
   Edit,
   MapPin,
   Navigation,
+  Download,
 } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
+import { exportToPDF } from "../../utils/pdfExport";
 import { DeliveriesDetailsModel } from "./model/DeliveriesDetailsModel";
 import { DeliveriesUpdateModel } from "./model/DeliveriesUpdateModel";
 import { DeliveriesLocationUpdateModel } from "./model/DeliveriesLocationUpdateModel";
@@ -94,6 +96,51 @@ export function Deliveries() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExport = () => {
+    const getItemsCount = (order) => {
+      return (
+        order.items?.reduce((sum, item) => sum + parseInt(item.quantity), 0) ||
+        0
+      );
+    };
+
+    const formatDate = (dateObj) => {
+      if (!dateObj || Object.keys(dateObj).length === 0) return "N/A";
+      try {
+        const date = new Date(dateObj);
+        return date.toLocaleDateString();
+      } catch {
+        return "N/A";
+      }
+    };
+
+    const exportColumns = [
+      { key: "orderNumber", header: "Order #" },
+      {
+        key: "items",
+        header: "Items",
+        render: (val, row) => `${getItemsCount(row)} item(s)`,
+      },
+      {
+        key: "totalAmount",
+        header: "Total",
+        render: (val) => `$${parseFloat(val || 0).toFixed(2)}`,
+      },
+      { key: "status", header: "Status" },
+      {
+        key: "deliveryDate",
+        header: "Delivery",
+        render: (val) => formatDate(val),
+      },
+    ];
+    exportToPDF(
+      filteredOrders,
+      exportColumns,
+      "deliveries-report",
+      "Deliveries Report",
+    );
   };
 
   const handleUpdateStatus = (order) => {
@@ -351,6 +398,14 @@ export function Deliveries() {
             View and manage your assigned delivery orders
           </p>
         </div>
+        <Button
+          variant="secondary"
+          leftIcon={<Download className="h-4 w-4" />}
+          className="w-full sm:w-auto"
+          onClick={handleExport}
+        >
+          Export
+        </Button>
       </div>
 
       {/* Filters */}
