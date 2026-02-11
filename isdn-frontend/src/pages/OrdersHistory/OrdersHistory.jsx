@@ -182,14 +182,14 @@ export function OrdersHistory() {
             className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group"
             title="View Details"
           >
-            <Eye className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+            <Eye className="h-4 w-4 text-blue-800 hover:bg-blue-50 rounded hover:text-blue-600 transition-colors" />
           </button>
           <button
             onClick={() => handleViewLocation(row)}
             className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group"
             title="View Location"
           >
-            <MapPin className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
+            <MapPin className="h-4 w-4 text-blue-800 hover:bg-purple-50 rounded hover:text-purple-600 transition-colors" />
           </button>
         </div>
       ),

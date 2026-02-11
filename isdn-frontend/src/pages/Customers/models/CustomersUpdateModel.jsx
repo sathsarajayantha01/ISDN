@@ -3,6 +3,11 @@ import { Modal } from "../../../components/feedback/Modal";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { Select } from "../../../components/ui/Select";
+import { MapPicker } from "../../../components/ui/MapPicker";
+import {
+  GOOGLE_MAPS_API_KEY,
+  DEFAULT_MAP_CENTER,
+} from "../../../config/maps.config";
 
 export function CustomersUpdateModel({
   isOpen,
@@ -27,7 +32,11 @@ export function CustomersUpdateModel({
     customerType: "",
     assignedBranchId: "",
     licenseNumber: "",
+    latitude: "",
+    longitude: "",
   });
+  const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER);
+  const [markerPosition, setMarkerPosition] = useState(null);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -49,7 +58,19 @@ export function CustomersUpdateModel({
         customerType: customer.customerType || "",
         assignedBranchId: customer.assignedBranchId || "",
         licenseNumber: customer.licenseNumber || "",
+        latitude: customer.latitude || "",
+        longitude: customer.longitude || "",
       });
+
+      // Set initial marker position if coordinates exist
+      if (customer.latitude && customer.longitude) {
+        const lat = parseFloat(customer.longitude);
+        const lng = parseFloat(customer.latitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          setMarkerPosition({ lat, lng });
+          setMapCenter({ lat, lng });
+        }
+      }
     }
   }, [customer]);
 
@@ -120,6 +141,14 @@ export function CustomersUpdateModel({
       newErrors.address = "Address is required";
     }
 
+    if (!formData.latitude) {
+      newErrors.latitude = "Please select location on map";
+    }
+
+    if (!formData.longitude) {
+      newErrors.longitude = "Please select location on map";
+    }
+
     // Only validate business-specific fields when customer type is Business
     if (formData.customerType === "Business") {
       if (!formData.district.trim()) {
@@ -155,6 +184,37 @@ export function CustomersUpdateModel({
     }
   };
 
+  const handleLocationSelect = (location) => {
+    setMarkerPosition(location);
+    setFormData((prev) => ({
+      ...prev,
+      latitude: location.lng.toFixed(6),
+      longitude: location.lat.toFixed(6),
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      latitude: "",
+      longitude: "",
+    }));
+  };
+
+  const handleCoordinateChange = (e) => {
+    const { name, value } = e.target;
+    handleChange(e);
+
+    const updatedData = { ...formData, [name]: value };
+    const lat = parseFloat(
+      name === "longitude" ? value : updatedData.longitude,
+    );
+    const lng = parseFloat(name === "latitude" ? value : updatedData.latitude);
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      setMarkerPosition({ lat, lng });
+      setMapCenter({ lat, lng });
+    }
+  };
+
   const handleClose = () => {
     setFormData({
       name: "",
@@ -171,7 +231,10 @@ export function CustomersUpdateModel({
       customerType: "",
       assignedBranchId: "",
       licenseNumber: "",
+      latitude: "",
+      longitude: "",
     });
+    setMarkerPosition(null);
     setErrors({});
     onClose();
   };
@@ -293,6 +356,72 @@ export function CustomersUpdateModel({
             disabled
             placeholder="Branch"
           />
+        </div>
+
+        {/* Location Selection with Google Map */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Update Location on Map <span className="text-red-500">*</span>
+          </label>
+          <div className="space-y-3">
+            {/* Map Component */}
+            <MapPicker
+              apiKey={GOOGLE_MAPS_API_KEY}
+              initialCenter={mapCenter}
+              selectedLocation={markerPosition}
+              onLocationSelect={handleLocationSelect}
+            />
+
+            {/* Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-xs text-blue-800">
+                <strong>Note:</strong> Click on the map to update customer
+                location, or edit coordinates manually. Drag the marker to
+                adjust.
+              </p>
+            </div>
+
+            {/* Coordinate Inputs */}
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Latitude"
+                name="longitude"
+                type="number"
+                step="any"
+                placeholder="e.g. 6.032370"
+                value={formData.longitude}
+                onChange={handleCoordinateChange}
+                error={errors.latitude}
+              />
+              <Input
+                label="Longitude"
+                name="latitude"
+                type="number"
+                step="any"
+                placeholder="e.g. 80.216472"
+                value={formData.latitude}
+                onChange={handleCoordinateChange}
+                error={errors.longitude}
+              />
+            </div>
+
+            {markerPosition && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-xs text-green-800">
+                  ✓ Location: Lat {markerPosition.lat.toFixed(6)}, Lng{" "}
+                  {markerPosition.lng.toFixed(6)}
+                </p>
+              </div>
+            )}
+
+            {(errors.latitude || errors.longitude) && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-xs text-red-800">
+                  {errors.latitude || errors.longitude}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Business-specific fields - only show when customer type is Business */}

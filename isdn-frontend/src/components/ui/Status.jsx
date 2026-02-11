@@ -1,4 +1,4 @@
-export function Badge({ status, className = "" }) {
+export function Status({ status, className = "" }) {
   const getStatusStyles = (s) => {
     switch (s.toLowerCase()) {
       case "active":
@@ -11,10 +11,11 @@ export function Badge({ status, className = "" }) {
         return "bg-teal-50 text-teal-700 border-teal-200";
       case "confirmed":
       case "assigned":
-        return "bg-blue-50 text-blue-700 border-blue-200";
+        return "bg-teal-50 text-teal-700 border-teal-200";
       case "dispatched":
         return "bg-purple-50 text-purple-700 border-purple-200";
       case "pending":
+        return "bg-pink-50 text-pink-700 border-pink-200";
       case "low_stock":
         return "bg-amber-50 text-amber-700 border-amber-200";
       case "processing":

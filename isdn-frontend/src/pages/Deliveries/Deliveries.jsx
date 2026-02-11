@@ -5,11 +5,20 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import { Card } from "../../components/ui/Card";
-import { Search, Filter, AlertCircle, Eye, Edit, MapPin } from "lucide-react";
+import {
+  Search,
+  Filter,
+  AlertCircle,
+  Eye,
+  Edit,
+  MapPin,
+  Navigation,
+} from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
 import { DeliveriesDetailsModel } from "./model/DeliveriesDetailsModel";
 import { DeliveriesUpdateModel } from "./model/DeliveriesUpdateModel";
 import { DeliveriesLocationUpdateModel } from "./model/DeliveriesLocationUpdateModel";
+import { LocationViewModal } from "../../components/feedback/LocationViewModal";
 import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Deliveries() {
@@ -23,6 +32,7 @@ export function Deliveries() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [isLocationViewModalOpen, setIsLocationViewModalOpen] = useState(false);
   const [alertModal, setAlertModal] = useState({
     isOpen: false,
     message: "",
@@ -130,6 +140,11 @@ export function Deliveries() {
   const handleUpdateLocation = (order) => {
     setSelectedOrder(order);
     setIsLocationModalOpen(true);
+  };
+
+  const handleViewLocation = (order) => {
+    setSelectedOrder(order);
+    setIsLocationViewModalOpen(true);
   };
 
   const handleLocationUpdate = async (orderId, locationData) => {
@@ -264,21 +279,28 @@ export function Deliveries() {
             className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group"
             title="View Details"
           >
-            <Eye className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+            <Eye className="h-4 w-4 text-blue-800 hover:bg-blue-50 rounded hover:text-blue-600 transition-colors" />
           </button>
           <button
             onClick={() => handleUpdateStatus(row)}
             className="p-1.5 hover:bg-amber-50 rounded-lg transition-colors group"
             title="Edit Status"
           >
-            <Edit className="h-4 w-4 text-amber-600 group-hover:text-amber-700" />
+            <Edit className="h-4 w-4 text-blue-800 hover:bg-amber-50 rounded hover:text-amber-700 transition-colors" />
           </button>
           <button
             onClick={() => handleUpdateLocation(row)}
             className="p-1.5 hover:bg-green-50 rounded-lg transition-colors group"
             title="Update Location"
           >
-            <MapPin className="h-4 w-4 text-green-600 group-hover:text-green-700" />
+            <MapPin className="h-4 w-4 text-blue-800 hover:bg-green-50 rounded hover:text-green-700 transition-colors" />
+          </button>
+          <button
+            onClick={() => handleViewLocation(row)}
+            className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group"
+            title="View Location"
+          >
+            <Navigation className="h-4 w-4 text-blue-800 hover:bg-purple-50 rounded hover:text-purple-700 transition-colors" />
           </button>
         </div>
       ),
@@ -396,6 +418,13 @@ export function Deliveries() {
         onClose={() => setIsLocationModalOpen(false)}
         order={selectedOrder}
         onUpdate={handleLocationUpdate}
+      />
+
+      {/* Location View Modal */}
+      <LocationViewModal
+        isOpen={isLocationViewModalOpen}
+        onClose={() => setIsLocationViewModalOpen(false)}
+        order={selectedOrder}
       />
 
       {/* Alert Modal */}

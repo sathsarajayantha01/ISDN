@@ -17,6 +17,8 @@ export interface User {
   branchId?: bigint | null;
   vehicleId?: bigint | null;
   licenseNumber?: string | null;
+  latitude?: Decimal | null;
+  longitude?: Decimal | null;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -58,6 +60,8 @@ export interface CreateUserDto {
   vehicleBrand?: string;
   vehicleCapacity?: Decimal;
   licenseNumber?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface UpdateUserDto {
@@ -76,6 +80,8 @@ export interface UpdateUserDto {
   branchId?: bigint;
   vehicleId?: bigint;
   licenseNumber?: string;
+  latitude?: number;
+  longitude?: number;
   active?: boolean;
 }
 

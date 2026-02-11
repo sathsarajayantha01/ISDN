@@ -115,7 +115,7 @@ export function DataTable({
                         {onView && (
                           <button
                             onClick={() => onView(item)}
-                            className="p-1.5 sm:p-1 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            className="p-1.5 sm:p-1 text-blue-800 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
@@ -124,7 +124,7 @@ export function DataTable({
                         {onEdit && (
                           <button
                             onClick={() => onEdit(item)}
-                            className="p-1.5 sm:p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-1.5 sm:p-1 text-blue-800 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             title="Edit"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function DataTable({
                         {onDelete && (
                           <button
                             onClick={() => onDelete(item)}
-                            className="p-1.5 sm:p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-1.5 sm:p-1 text-blue-800 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="h-4 w-4" />
