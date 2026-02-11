@@ -7,10 +7,10 @@ import { Select } from "../../components/ui/Select";
 import { Card } from "../../components/ui/Card";
 import { Search, Filter, AlertCircle, Eye, Edit, MapPin } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
-import { useToast } from "../../hooks/useToast";
 import { DeliveriesDetailsModel } from "./model/DeliveriesDetailsModel";
 import { DeliveriesUpdateModel } from "./model/DeliveriesUpdateModel";
 import { DeliveriesLocationUpdateModel } from "./model/DeliveriesLocationUpdateModel";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function Deliveries() {
   const [orders, setOrders] = useState([]);
@@ -23,7 +23,11 @@ export function Deliveries() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const { addToast } = useToast();
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   // Check if user is a Driver
   const userRole = localStorage.getItem("userRole");
@@ -46,7 +50,11 @@ export function Deliveries() {
 
       if (!userId) {
         setError("User information not found");
-        addToast("error", "User information not found");
+        setAlertModal({
+          isOpen: true,
+          message: "User information not found",
+          isSuccess: false,
+        });
         return;
       }
 
@@ -59,11 +67,19 @@ export function Deliveries() {
         setOrders(response.data);
       } else {
         setError(response.message || "Failed to fetch orders");
-        addToast("error", "Failed to fetch orders");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to fetch orders",
+          isSuccess: false,
+        });
       }
     } catch (err) {
       setError("An error occurred while fetching orders");
-      addToast("error", "An error occurred while fetching orders");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while fetching orders",
+        isSuccess: false,
+      });
       console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
@@ -83,13 +99,25 @@ export function Deliveries() {
       );
 
       if (response.success) {
-        addToast("success", "Order status updated successfully");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Order status updated successfully",
+          isSuccess: true,
+        });
         await fetchOrders(); // Refresh the orders list
       } else {
-        addToast("error", response.message || "Failed to update order");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update order",
+          isSuccess: false,
+        });
       }
     } catch (err) {
-      addToast("error", "An error occurred while updating the order");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while updating the order",
+        isSuccess: false,
+      });
       console.error("Error updating order:", err);
     }
   };
@@ -112,13 +140,25 @@ export function Deliveries() {
       );
 
       if (response.success) {
-        addToast("success", "Location updated successfully");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Location updated successfully",
+          isSuccess: true,
+        });
         await fetchOrders(); // Refresh the orders list
       } else {
-        addToast("error", response.message || "Failed to update location");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update location",
+          isSuccess: false,
+        });
       }
     } catch (err) {
-      addToast("error", "An error occurred while updating location");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while updating location",
+        isSuccess: false,
+      });
       console.error("Error updating location:", err);
     }
   };
@@ -356,6 +396,16 @@ export function Deliveries() {
         onClose={() => setIsLocationModalOpen(false)}
         order={selectedOrder}
         onUpdate={handleLocationUpdate}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );

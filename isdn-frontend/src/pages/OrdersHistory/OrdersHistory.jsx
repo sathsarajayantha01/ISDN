@@ -14,9 +14,9 @@ import {
   MapPin,
 } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
-import { useToast } from "../../hooks/useToast";
 import { OrderDetailsModel } from "./model/OrderDetailsModel";
 import { LocationViewModal } from "../../components/feedback/LocationViewModal";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function OrdersHistory() {
   const [orders, setOrders] = useState([]);
@@ -28,7 +28,11 @@ export function OrdersHistory() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const { addToast } = useToast();
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   useEffect(() => {
     fetchOrders();
@@ -49,11 +53,19 @@ export function OrdersHistory() {
         setOrders(response.data);
       } else {
         setError(response.message || "Failed to fetch orders");
-        addToast("error", "Failed to fetch orders");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to fetch orders",
+          isSuccess: false,
+        });
       }
     } catch (err) {
       setError("An error occurred while fetching orders");
-      addToast("error", "An error occurred while fetching orders");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while fetching orders",
+        isSuccess: false,
+      });
       console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
@@ -76,7 +88,11 @@ export function OrdersHistory() {
           o.id === order.id ? { ...o, status: "Cancelled" } : o,
         ),
       );
-      addToast("info", "Order cancelled");
+      setAlertModal({
+        isOpen: true,
+        message: "Order cancelled",
+        isSuccess: true,
+      });
     }
   };
 
@@ -286,6 +302,16 @@ export function OrdersHistory() {
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}
         order={selectedOrder}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );

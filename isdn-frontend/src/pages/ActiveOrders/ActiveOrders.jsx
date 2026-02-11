@@ -16,11 +16,11 @@ import {
   MapPin,
 } from "lucide-react";
 import { apiAdapter } from "../../services/apiAdapter";
-import { useToast } from "../../hooks/useToast";
 import { ActiveOrdersDetailsModel } from "./model/ActiveOrdersDetailsModel";
 import { ActiveOrdersUpdateModel } from "./model/ActiveOrdersUpdateModel";
 import { ActiveOrdersAssignDriverModel } from "./model/ActiveOrdersAssignDriverModel";
 import { LocationViewModal } from "../../components/feedback/LocationViewModal";
+import { AlertModal } from "../../components/feedback/AlertModal";
 
 export function ActiveOrders() {
   const [orders, setOrders] = useState([]);
@@ -34,7 +34,11 @@ export function ActiveOrders() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isAssignDriverModalOpen, setIsAssignDriverModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const { addToast } = useToast();
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
 
   useEffect(() => {
     fetchOrders();
@@ -76,11 +80,19 @@ export function ActiveOrders() {
         setOrders(response.data);
       } else {
         setError(response.message || "Failed to fetch orders");
-        addToast("error", "Failed to fetch orders");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to fetch orders",
+          isSuccess: false,
+        });
       }
     } catch (err) {
       setError("An error occurred while fetching orders");
-      addToast("error", "An error occurred while fetching orders");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while fetching orders",
+        isSuccess: false,
+      });
       console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
@@ -100,13 +112,25 @@ export function ActiveOrders() {
       );
 
       if (response.success) {
-        addToast("success", "Order updated successfully");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Order updated successfully",
+          isSuccess: true,
+        });
         await fetchOrders(); // Refresh the orders list
       } else {
-        addToast("error", response.message || "Failed to update order");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to update order",
+          isSuccess: false,
+        });
       }
     } catch (err) {
-      addToast("error", "An error occurred while updating the order");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while updating the order",
+        isSuccess: false,
+      });
       console.error("Error updating order:", err);
     }
   };
@@ -123,7 +147,11 @@ export function ActiveOrders() {
           o.id === order.id ? { ...o, status: "Cancelled" } : o,
         ),
       );
-      addToast("info", "Order cancelled");
+      setAlertModal({
+        isOpen: true,
+        message: "Order cancelled",
+        isSuccess: true,
+      });
     }
   };
 
@@ -140,13 +168,25 @@ export function ActiveOrders() {
       );
 
       if (response.success) {
-        addToast("success", "Driver assigned successfully");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Driver assigned successfully",
+          isSuccess: true,
+        });
         await fetchOrders(); // Refresh the orders list
       } else {
-        addToast("error", response.message || "Failed to assign driver");
+        setAlertModal({
+          isOpen: true,
+          message: response.message || "Failed to assign driver",
+          isSuccess: false,
+        });
       }
     } catch (err) {
-      addToast("error", "An error occurred while assigning the driver");
+      setAlertModal({
+        isOpen: true,
+        message: "An error occurred while assigning the driver",
+        isSuccess: false,
+      });
       console.error("Error assigning driver:", err);
     }
   };
@@ -392,6 +432,16 @@ export function ActiveOrders() {
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}
         order={selectedOrder}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() =>
+          setAlertModal({ isOpen: false, message: "", isSuccess: false })
+        }
+        message={alertModal.message}
+        isSuccess={alertModal.isSuccess}
       />
     </div>
   );
