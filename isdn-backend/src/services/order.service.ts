@@ -7,6 +7,7 @@ import {
   UpdateLocationDto,
 } from "../types";
 import prisma from "../../config/database";
+import emailService from "../utils/email";
 
 class OrderService {
   async getAllOrders(): Promise<Order[]> {
@@ -134,7 +135,20 @@ class OrderService {
       throw new Error("Order must have at least one item");
     }
 
-    return await orderRepository.create(orderData);
+    const order = await orderRepository.create(orderData);
+
+    // Send order creation email to customer
+    if (order && (order as any).user) {
+      const orderWithDetails = order as any;
+      await emailService.sendOrderCreatedEmail(
+        orderWithDetails.user.email,
+        orderWithDetails.user.name,
+        orderWithDetails,
+        orderWithDetails.items || [],
+      );
+    }
+
+    return order;
   }
 
   async updateOrderStatus(
@@ -179,6 +193,18 @@ class OrderService {
     );
     if (!updatedOrder) {
       throw new Error("Failed to update order status");
+    }
+
+    // Send order status update email to customer
+    if (updatedOrder && (updatedOrder as any).user) {
+      const orderWithDetails = updatedOrder as any;
+      await emailService.sendOrderStatusUpdateEmail(
+        orderWithDetails.user.email,
+        orderWithDetails.user.name,
+        orderWithDetails,
+        currentStatus,
+        statusData.status,
+      );
     }
 
     return updatedOrder;
@@ -249,6 +275,18 @@ class OrderService {
 
     if (!updatedOrder) {
       throw new Error("Failed to update order location");
+    }
+
+    // Send location update email to customer
+    if (updatedOrder && (updatedOrder as any).user) {
+      const orderWithDetails = updatedOrder as any;
+      await emailService.sendLocationUpdateEmail(
+        orderWithDetails.user.email,
+        orderWithDetails.user.name,
+        orderWithDetails,
+        locationData.latitude,
+        locationData.longitude,
+      );
     }
 
     return updatedOrder;

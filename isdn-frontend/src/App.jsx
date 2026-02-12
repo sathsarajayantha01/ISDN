@@ -35,6 +35,7 @@ const getDefaultPageForRole = (role) => {
     case "Driver":
       return "deliveries";
     case "System Administrator":
+      return "adminUsers";
     case "RDC Staff":
     case "Logistics Officer":
     case "Head Office Manager":

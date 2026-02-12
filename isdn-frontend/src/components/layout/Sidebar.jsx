@@ -65,7 +65,7 @@ export function Sidebar({
       id: "product-categories",
       label: "Product Categories",
       icon: Package2,
-      roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
+      roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
     },
     {
       id: "customer-products",
@@ -77,40 +77,25 @@ export function Sidebar({
       id: "products",
       label: "Products",
       icon: Package,
-      roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
+      roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
     },
     {
       id: "inventory",
       label: "Inventory",
       icon: Archive,
-      roles: [
-        "System Administrator",
-        "RDC Staff",
-        "Logistics Officer",
-        "Head Office Manager",
-      ],
+      roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
     },
     {
       id: "active-orders",
       label: "Active Orders",
       icon: BaggageClaim,
-      roles: [
-        "System Administrator",
-        "RDC Staff",
-        "Logistics Officer",
-        "Head Office Manager",
-      ],
+      roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
     },
     {
       id: "delivered-orders",
       label: "Delivered Orders",
       icon: ShoppingCart,
-      roles: [
-        "System Administrator",
-        "RDC Staff",
-        "Logistics Officer",
-        "Head Office Manager",
-      ],
+      roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
     },
     {
       id: "orders-history",
@@ -122,7 +107,7 @@ export function Sidebar({
       id: "deliveries",
       label: "Deliveries",
       icon: Truck,
-      roles: ["System Administrator", "Driver"],
+      roles: ["Driver"],
     },
     {
       id: "adminUsers",
@@ -144,7 +129,11 @@ export function Sidebar({
       id: "customers",
       label: "Customers",
       icon: Users,
-      roles: ["System Administrator", "RDC Staff", "Head Office Manager"],
+      roles: [
+        "System Administrator",
+        "Logistics Officer",
+        "Head Office Manager",
+      ],
     },
     {
       id: "account",
