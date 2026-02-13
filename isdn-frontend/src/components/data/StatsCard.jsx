@@ -13,7 +13,7 @@ export function StatsCard({ metric }) {
   };
 
   return (
-    <Card className="p-4 sm:p-5 md:p-6">
+    <Card className="p-4 sm:p-1 md:p-1">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs sm:text-sm font-medium text-slate-500 truncate">
