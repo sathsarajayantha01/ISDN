@@ -121,6 +121,7 @@ function AppContent() {
     localStorage.removeItem("branchId");
     localStorage.removeItem("username");
     localStorage.removeItem("userRole");
+    localStorage.clear(); // Clear all localStorage (optional, if you want to clear everything)
 
     // Update state to navigate to login
     setIsAuthenticated(false);

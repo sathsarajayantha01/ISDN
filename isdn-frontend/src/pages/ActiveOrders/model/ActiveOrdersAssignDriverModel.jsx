@@ -32,7 +32,10 @@ export function ActiveOrdersAssignDriverModel({
       setLoading(true);
       setError(null);
 
-      const response = await apiAdapter.get("/users/role?roleName=Driver");
+      //get user by role and branch id in header
+      const response = await apiAdapter.get(`/users/role?roleName=Driver`, {
+        branchId: order?.branchId || null,
+      });
 
       if (response.success) {
         setDrivers(response.data || []);

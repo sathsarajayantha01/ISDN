@@ -1,4 +1,4 @@
-import { Package, AlertTriangle, ShoppingCart, Truck } from "lucide-react";
+import { Package, AlertTriangle, ShoppingCart, Truck, Box } from "lucide-react";
 
 export const branches = [
   { id: "1", name: "North RDC", code: "NORTH" },
@@ -220,31 +220,38 @@ export const orders = [
 
 export const stats = [
   {
-    label: "Total Products",
+    label: "Pending Orders",
     value: "1,248",
     trend: { value: 12, isPositive: true },
     icon: Package,
     color: "blue",
   },
   {
-    label: "Low Stock Alerts",
+    label: "Active Deliveries",
     value: "15",
     trend: { value: 4, isPositive: false },
     icon: AlertTriangle,
     color: "amber",
   },
   {
-    label: "Pending Orders",
+    label: "Completed Orders",
     value: "24",
     trend: { value: 8, isPositive: true },
     icon: ShoppingCart,
     color: "green",
   },
   {
-    label: "Active Deliveries",
+    label: "Cancelled Orders",
     value: "8",
     trend: { value: 2, isPositive: false },
     icon: Truck,
-    color: "blue",
+    color: "purple",
+  },
+  {
+    label: "Total Orders",
+    value: "8",
+    trend: { value: 2, isPositive: false },
+    icon: Box,
+    color: "pink",
   },
 ];

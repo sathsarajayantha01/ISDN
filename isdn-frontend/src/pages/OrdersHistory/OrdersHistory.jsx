@@ -45,10 +45,10 @@ export function OrdersHistory() {
       setError(null);
 
       // Get userId from localStorage
-      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      const userId = userInfo.id || "2";
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user.id || "2";
 
-      const response = await apiAdapter.get("/orders", { userId });
+      const response = await apiAdapter.get(`/orders?userId=${userId}`);
 
       if (response.success) {
         setOrders(response.data);

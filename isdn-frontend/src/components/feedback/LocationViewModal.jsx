@@ -30,10 +30,14 @@ export function LocationViewModal({ isOpen, onClose, order }) {
       let deliveryPos = null;
 
       // Get user location (customer/destination)
-      if (order.user && order.user.latitude && order.user.longitude) {
+      if (
+        order.customerLocation &&
+        order.customerLocation.latitude &&
+        order.customerLocation.longitude
+      ) {
         userPos = {
-          lat: parseFloat(order.user.longitude), // Note: mapping to correct lat/lng
-          lng: parseFloat(order.user.latitude),
+          lat: parseFloat(order.customerLocation.latitude),
+          lng: parseFloat(order.customerLocation.longitude),
         };
         setUserLocation(userPos);
       } else {
@@ -91,7 +95,7 @@ export function LocationViewModal({ isOpen, onClose, order }) {
                 <div className="flex items-center gap-4 text-sm text-blue-800">
                   <span>
                     <span className="font-medium">Name:</span>{" "}
-                    {order.user?.name || "N/A"}
+                    {order.customerLocation?.name || "N/A"}
                   </span>
                   <span>
                     <span className="font-medium">Lat:</span>{" "}

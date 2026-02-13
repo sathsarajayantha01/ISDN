@@ -62,9 +62,7 @@ export function DeliveredOrders() {
       }
 
       // get orders with delivered/cancelled statuses for selected branch
-      const response = await apiAdapter.get(
-        `/orders/status?${params.toString()}`,
-      );
+      const response = await apiAdapter.get(`/orders?${params.toString()}`);
 
       if (response.success) {
         setOrders(response.data);

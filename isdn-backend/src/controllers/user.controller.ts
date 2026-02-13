@@ -56,6 +56,7 @@ class UserController {
   ): Promise<void> {
     try {
       const { roleName } = req.query;
+      const branchId = req.headers.branchid as string | undefined;
 
       if (!roleName) {
         res.status(400).json({
@@ -65,7 +66,10 @@ class UserController {
         return;
       }
 
-      const users = await userService.getUsersByRoleName(roleName as string);
+      const users = await userService.getUsersByRoleName(
+        roleName as string,
+        branchId,
+      );
 
       // Remove password from response
       const sanitizedUsers = users.map((user) => {
