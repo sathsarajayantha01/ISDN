@@ -1,4 +1,4 @@
-import { Dashboard } from "../pages/Dashboard";
+import { Dashboard } from "../pages/Dashboard/Dashboard";
 import { ActiveOrders } from "../pages/ActiveOrders/ActiveOrders";
 import { Users } from "../pages/Users/Users";
 import { Drivers } from "../pages/Drivers/Drivers";

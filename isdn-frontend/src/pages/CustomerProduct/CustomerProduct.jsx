@@ -202,8 +202,8 @@ export function CustomerProduct() {
   const handleConfirmOrder = async (orderData) => {
     try {
       // Get user info from localStorage
-      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      const userId = userInfo.id || 2;
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user.id || 2;
       const branchId = localStorage.getItem("branchId") || "1";
       const token = localStorage.getItem("token");
 
@@ -230,6 +230,7 @@ export function CustomerProduct() {
         address: orderData.address,
         contactNumber: orderData.contactNumber,
         specialNotes: orderData.specialNotes,
+        customerLocation: orderData.customerLocation,
       };
 
       // Call order API

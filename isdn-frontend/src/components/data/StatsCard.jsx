@@ -8,10 +8,12 @@ export function StatsCard({ metric }) {
     green: "bg-green-50 text-green-600",
     amber: "bg-amber-50 text-amber-600",
     red: "bg-red-50 text-red-600",
+    purple: "bg-purple-50 text-purple-600",
+    pink: "bg-pink-50 text-pink-600",
   };
 
   return (
-    <Card className="p-3 sm:p-4 md:p-6">
+    <Card className="p-4 sm:p-5 md:p-6">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs sm:text-sm font-medium text-slate-500 truncate">
@@ -38,10 +40,10 @@ export function StatsCard({ metric }) {
             ) : (
               <ArrowDownRight className="mr-0.5 h-3 w-3 sm:h-4 sm:w-4" />
             )}
-            {Math.abs(metric.trend.value)}%
+            {Math.abs(metric.trend.value)}
           </span>
           <span className="ml-1 sm:ml-2 text-slate-400 hidden sm:inline">
-            vs last month
+            avg per day
           </span>
         </div>
       )}

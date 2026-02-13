@@ -1,4 +1,5 @@
 import { Decimal } from "@prisma/client/runtime/client";
+import { Prisma } from "@prisma/client";
 
 export interface User {
   id: bigint;
@@ -227,6 +228,12 @@ export interface UpdatePromotionDto {
   active?: boolean;
 }
 
+// Helper type for location data stored in JSON fields
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+}
+
 export interface Order {
   id: bigint;
   orderNumber: string;
@@ -237,6 +244,11 @@ export interface Order {
   totalAmount: Decimal;
   deliveryDate?: Date | null;
   specialNotes?: string | null;
+  address?: string | null;
+  contactNumber?: string | null;
+  driverId?: bigint | null;
+  currentLocation?: Prisma.JsonValue | null;
+  customerLocation?: Prisma.JsonValue | null;
   createdAt: Date;
 }
 
@@ -261,6 +273,7 @@ export interface CreateOrderDto {
   address?: string;
   contactNumber?: string;
   specialNotes?: string;
+  customerLocation?: LocationData;
 }
 
 export interface UpdateOrderStatusDto {
@@ -271,7 +284,4 @@ export interface AssignDriverDto {
   driverId: bigint;
 }
 
-export interface UpdateLocationDto {
-  latitude: number;
-  longitude: number;
-}
+export interface UpdateLocationDto extends LocationData {}

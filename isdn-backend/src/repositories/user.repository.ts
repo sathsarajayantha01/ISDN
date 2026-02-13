@@ -187,5 +187,25 @@ class UserRepository {
       },
     });
   }
+
+  async findByRoleNameAndBranchId(
+    roleName: string,
+    branchId: string,
+  ): Promise<User[]> {
+    return await prisma.user.findMany({
+      where: {
+        role: {
+          roleName,
+        },
+        branchId: BigInt(branchId),
+      },
+      include: {
+        role: true,
+        branch: true,
+        assignedBranch: true,
+        vehicle: true,
+      },
+    });
+  }
 }
 export default new UserRepository();

@@ -393,6 +393,12 @@ class OrderRepository {
           address: orderData.address,
           contactNumber: orderData.contactNumber,
           specialNotes: orderData.specialNotes,
+          customerLocation: orderData.customerLocation
+            ? {
+                latitude: orderData.customerLocation.latitude,
+                longitude: orderData.customerLocation.longitude,
+              }
+            : null,
         },
         include: {
           user: {

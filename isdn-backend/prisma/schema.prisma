@@ -182,6 +182,7 @@ model Order {
   createdAt    DateTime    @default(now()) @map("created_at")
   driverId     BigInt?     @map("driver_id")
   currentLocation Json?     @map("current_location")
+  customerLocation Json?    @map("customer_location")
 
   user         User        @relation(fields: [userId], references: [id])
   branch       Branch      @relation(fields: [branchId], references: [id])

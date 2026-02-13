@@ -7,6 +7,7 @@ import productCategoryRoutes from "./productCategory.routes";
 import productRoutes from "./product.routes";
 import promotionRoutes from "./promotions.routes";
 import orderRoutes from "./order.routes";
+import dashboardRoutes from "./dashboard.routes";
 
 const api: Application = express();
 
@@ -18,5 +19,6 @@ api.use("/product-categories", productCategoryRoutes);
 api.use("/products", productRoutes);
 api.use("/promotions", promotionRoutes);
 api.use("/orders", orderRoutes);
+api.use("/dashboard", dashboardRoutes);
 
 export default api;

@@ -74,9 +74,7 @@ export function ActiveOrders() {
       }
 
       // get orders with active statuses for selected branch
-      const response = await apiAdapter.get(
-        `/orders/status?${params.toString()}`,
-      );
+      const response = await apiAdapter.get(`/orders?${params.toString()}`);
 
       if (response.success) {
         setOrders(response.data);
@@ -140,21 +138,6 @@ export function ActiveOrders() {
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
     setIsDetailsModalOpen(true);
-  };
-
-  const handleDeleteOrder = (order) => {
-    if (confirm(`Cancel order ${order.orderNumber}?`)) {
-      setOrders(
-        orders.map((o) =>
-          o.id === order.id ? { ...o, status: "Cancelled" } : o,
-        ),
-      );
-      setAlertModal({
-        isOpen: true,
-        message: "Order cancelled",
-        isSuccess: true,
-      });
-    }
   };
 
   const handleAssignDriver = (order) => {

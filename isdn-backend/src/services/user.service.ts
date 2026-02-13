@@ -48,9 +48,20 @@ class UserService {
     return user;
   }
 
-  async getUsersByRoleName(roleName: string): Promise<User[]> {
-    const users = await userRepository.findByRoleName(roleName);
-    return users;
+  async getUsersByRoleName(
+    roleName: string,
+    branchId: string | undefined,
+  ): Promise<User[]> {
+    if (branchId) {
+      const users = await userRepository.findByRoleNameAndBranchId(
+        roleName,
+        branchId,
+      );
+      return users;
+    } else {
+      const users = await userRepository.findByRoleName(roleName);
+      return users;
+    }
   }
 
   async createUser(userData: CreateUserDto): Promise<User> {

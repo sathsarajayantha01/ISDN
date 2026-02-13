@@ -4,21 +4,16 @@ import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { MapPin, Navigation } from "lucide-react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-
-// Google Maps API Key from environment variables
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+import {
+  GOOGLE_MAPS_API_KEY,
+  DEFAULT_MAP_CENTER,
+} from "../../../config/maps.config";
 
 // Map container style
 const mapContainerStyle = {
   width: "100%",
   height: "400px",
   borderRadius: "0.5rem",
-};
-
-// Default center (Sri Lanka - Colombo)
-const defaultCenter = {
-  lat: 6.9271,
-  lng: 79.8612,
 };
 
 export function DeliveriesLocationUpdateModel({
@@ -30,28 +25,36 @@ export function DeliveriesLocationUpdateModel({
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER);
   const [markerPosition, setMarkerPosition] = useState(null);
 
   useEffect(() => {
     if (order && isOpen) {
       // Pre-fill with current location if available
-      if (order.currentLocation) {
-        const lat = order.currentLocation.latitude || "";
-        const lng = order.currentLocation.longitude || "";
+      if (order.customerLocation) {
+        const lat = order.customerLocation.latitude || "";
+        const lng = order.customerLocation.longitude || "";
         setLatitude(lat);
         setLongitude(lng);
 
-        // Set map center and marker to current location
+        console.log("Order Latitude", lat);
+        console.log("Order Longitude", lng);
+
+        // Set map center and marker to current location if valid coordinates exist
         if (lat && lng) {
           const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
           setMapCenter(position);
           setMarkerPosition(position);
+        } else {
+          // If no valid coordinates, use default center
+          setMapCenter(DEFAULT_MAP_CENTER);
+          setMarkerPosition(null);
         }
       } else {
+        // No current location, reset to defaults
         setLatitude("");
         setLongitude("");
-        setMapCenter(defaultCenter);
+        setMapCenter(DEFAULT_MAP_CENTER);
         setMarkerPosition(null);
       }
     }
