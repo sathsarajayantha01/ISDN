@@ -154,36 +154,6 @@ async function main() {
 
   console.log("\nDatabase seeding completed successfully!");
 
-  const productCategories = [
-    {
-      name: "Packaged Foods",
-      description: "Various packaged food items",
-    },
-    {
-      name: "Beverages",
-      description: "Soft drinks, juices, and other beverages",
-    },
-    {
-      name: "Personal Care & Hygiene",
-      description: "Products for personal care and hygiene",
-    },
-    {
-      name: "Home Cleaning & Household Care",
-      description: "Cleaning supplies and household care products",
-    },
-  ];
-
-  console.log("Creating product categories...");
-
-  for (const categoryData of productCategories) {
-    const category = await prisma.productCategory.upsert({
-      where: { name: categoryData.name },
-      update: {},
-      create: categoryData,
-    });
-    console.log(`Created product category: ${category.name}`);
-  }
-
   const promotionTypes = [
     {
       title: "Discount",

@@ -8,6 +8,7 @@ import productRoutes from "./product.routes";
 import promotionRoutes from "./promotions.routes";
 import orderRoutes from "./order.routes";
 import dashboardRoutes from "./dashboard.routes";
+import stockTransferRoutes from "./stockTransfer.routes";
 
 const api: Application = express();
 
@@ -20,5 +21,6 @@ api.use("/products", productRoutes);
 api.use("/promotions", promotionRoutes);
 api.use("/orders", orderRoutes);
 api.use("/dashboard", dashboardRoutes);
+api.use("/stock-transfers", stockTransferRoutes);
 
 export default api;

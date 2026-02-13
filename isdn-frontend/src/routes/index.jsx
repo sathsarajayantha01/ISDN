@@ -11,6 +11,8 @@ import { OrdersHistory } from "../pages/OrdersHistory/OrdersHistory";
 import { Account } from "../pages/Account/Account";
 import { Deliveries } from "../pages/Deliveries/Deliveries";
 import { DeliveredOrders } from "../pages/DeliveredOrders/DeliveredOrders";
+import { CreateTransfer } from "../pages/StockTransfer/CreateTransfer";
+import { TransferList } from "../pages/StockTransfer/TransferList";
 
 export const routes = [
   {
@@ -77,6 +79,16 @@ export const routes = [
     path: "account",
     element: Account,
     label: "My Account",
+  },
+  {
+    path: "create-transfer",
+    element: CreateTransfer,
+    label: "Create Transfer",
+  },
+  {
+    path: "stock-transfers",
+    element: TransferList,
+    label: "Stock Transfers",
   },
 ];
 

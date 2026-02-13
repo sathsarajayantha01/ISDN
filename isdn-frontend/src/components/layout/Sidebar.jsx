@@ -16,6 +16,7 @@ import {
   UserRoundCog,
   LogOut,
   UserRoundPen,
+  ArrowLeftRight,
   X,
 } from "lucide-react";
 
@@ -84,6 +85,28 @@ export function Sidebar({
       label: "Inventory",
       icon: Archive,
       roles: ["RDC Staff", "Logistics Officer", "Head Office Manager"],
+    },
+    {
+      id: "create-transfer",
+      label: "Create Transfer",
+      icon: ArrowLeftRight,
+      roles: [
+        "System Administrator",
+        "Head Office Manager",
+        "RDC Staff",
+        "Logistics Officer",
+      ],
+    },
+    {
+      id: "stock-transfers",
+      label: "Stock Transfers",
+      icon: ArrowLeftRight,
+      roles: [
+        "System Administrator",
+        "Head Office Manager",
+        "RDC Staff",
+        "Logistics Officer",
+      ],
     },
     {
       id: "active-orders",

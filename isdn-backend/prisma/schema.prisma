@@ -17,13 +17,11 @@ model User {
   roleId             BigInt    @map("role_id")
   name               String
   contactNumber      String    @map("contact_number")
-  address            String?   @db.Text
-  latitude           Decimal?  @db.Decimal(10, 8)
-  longitude          Decimal?  @db.Decimal(11, 8)
   
   // Customer-specific
   businessName       String?   @map("business_name")
   customerCode       String?   @unique @map("customer_code")
+  address            String?   @db.Text
   district           String?
   customerType       String?   @map("customer_type") // Retail, Supermarket, Reseller
   assignedBranchId   BigInt?   @map("assigned_branch_id")
@@ -34,6 +32,10 @@ model User {
   // Driver-specific
   vehicleId          BigInt?   @map("vehicle_id")
   licenseNumber      String?   @map("license_number")
+
+  // Location
+  latitude           Decimal?  @db.Decimal(10, 8)
+  longitude          Decimal?  @db.Decimal(11, 8)
   
   active             Boolean   @default(true)
   createdAt          DateTime  @default(now()) @map("created_at")
@@ -50,8 +52,6 @@ model User {
   deliveries         Delivery[] @relation("DriverDeliveries")
   invoices           Invoice[]
   paymentsCollected  Payment[]  @relation("CollectedBy")
-
-
 
   @@map("user")
 }
@@ -79,9 +79,11 @@ model Branch {
   users            User[]          @relation("UserBranch")
   assignedCustomers User[]         @relation("CustomerAssignedBranch")
   vehicles         Vehicle[]
-  inventories      Inventory[]     @relation("InventoryBranch")
+  inventories      Inventory[]
   reservedInventories Inventory[]  @relation("ReservedBranch")
   orders           Order[]
+  sentTransfers     StockTransfer[] @relation("FromBranch")
+  receivedTransfers StockTransfer[] @relation("ToBranch")
 
   @@map("branch")
 }
@@ -104,92 +106,110 @@ model Vehicle {
   @@map("vehicle")
 }
 
+model ProductCategory {
+  id          BigInt    @id @default(autoincrement())
+  name        String    @unique
+  description String?   @db.Text
+  product     Product[]
+
+  @@map("product_category")
+}
+
 model Product {
-  id            BigInt     @id @default(autoincrement())
-  productCode   String     @unique @map("product_code")
+  id            BigInt           @id @default(autoincrement())
+  productCode   String           @unique @map("product_code")
   name          String
-  categoryId    BigInt     @map("category_id")
-  unitPrice     Decimal    @map("unit_price") @db.Decimal(10, 2)
-  unitType      String     @map("unit_type")
-  promotionId   BigInt?    @map("promotion_id")
-  description   String?    @db.Text
-  imageUrl      String?    @map("image_url")
-  active        Boolean    @default(true)
+  categoryId    BigInt           @map("category_id")
+  unitPrice     Decimal          @map("unit_price") @db.Decimal(10, 2)
+  unitType      String           @map("unit_type")
+  promotionId   BigInt?          @map("promotion_id")
+  description   String?          @db.Text
+  imageUrl      String?          @map("image_url")
+  active        Boolean          @default(true)
 
   // Relations
-  category      ProductCategory @relation(fields: [categoryId], references: [id])
-  promotion     Promotion? @relation(fields: [promotionId], references: [id])
+  category      ProductCategory  @relation(fields: [categoryId], references: [id])
+  promotion     Promotion?       @relation(fields: [promotionId], references: [id])
+  productImages ProductImage[]
   inventories   Inventory[]
   orderItems    OrderItem[]
-  productImages ProductImage[]
-
+  stockTransfers StockTransfer[]
 
   @@map("product")
 }
 
-// New model for store product images
 model ProductImage {
   id        BigInt   @id @default(autoincrement())
   productId BigInt   @map("product_id")
   imageUrl  String   @map("image_url")
   createdAt DateTime @default(now()) @map("created_at")
 
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("product_image")
 }
 
-
-model ProductCategory {
-  id          BigInt   @id @default(autoincrement())
-  name        String   @unique
-  description String?  @db.Text
-
-  product    Product[]
-
-  @@map("product_category")
-}
 model Inventory {
   id               BigInt   @id @default(autoincrement())
   productId        BigInt   @map("product_id")
   branchId         BigInt   @map("branch_id")
   quantity         Int
-  active           Boolean  @default(true)
   reservedQuantity Int      @default(0) @map("reserved_quantity")
-  reservedBranchId  BigInt?  @map("reserved_branch_id")
+  active           Boolean  @default(true)
   lastUpdated      DateTime @default(now()) @updatedAt @map("last_updated")
 
+  reservedBranchId BigInt?  @map("reserved_branch_id")
+
   product          Product  @relation(fields: [productId], references: [id])
-  branch           Branch   @relation("InventoryBranch", fields: [branchId], references: [id])
+  branch           Branch   @relation(fields: [branchId], references: [id])
   reservedBranch   Branch?  @relation("ReservedBranch", fields: [reservedBranchId], references: [id])
 
   @@unique([productId, branchId])
   @@map("inventory")
 }
 
-model Order {
-  id           BigInt      @id @default(autoincrement())
-  orderNumber  String      @unique @map("order_number")
-  userId       BigInt      @map("user_id")
-  branchId     BigInt      @map("branch_id")
-  orderDate    DateTime    @default(now()) @map("order_date")
-  status       String      // Pending, Confirmed, etc.
-  totalAmount  Decimal     @map("total_amount") @db.Decimal(10, 2)
-  deliveryDate DateTime?   @map("delivery_date")
-  specialNotes String?     @db.Text @map("special_notes")
-  address      String?     @db.Text
-  contactNumber String?     @db.Text @map("contact_number")
-  createdAt    DateTime    @default(now()) @map("created_at")
-  driverId     BigInt?     @map("driver_id")
-  currentLocation Json?     @map("current_location")
-  customerLocation Json?    @map("customer_location")
+model StockTransfer {
+  id             BigInt   @id @default(autoincrement())
+  productId      BigInt   @map("product_id")
+  fromBranchId   BigInt   @map("from_branch_id")
+  toBranchId     BigInt   @map("to_branch_id")
+  quantity       Int
+  transferDate   DateTime @default(now()) @map("transfer_date")
+  status         String   @default("Pending")
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  user         User        @relation(fields: [userId], references: [id])
-  branch       Branch      @relation(fields: [branchId], references: [id])
-  driver       User?       @relation("DriverOrders", fields: [driverId], references: [id])
-  items        OrderItem[]
-  deliveries   Delivery[]
-  invoices     Invoice[]
+  product        Product  @relation(fields: [productId], references: [id])
+  fromBranch     Branch   @relation("FromBranch", fields: [fromBranchId], references: [id])
+  toBranch       Branch   @relation("ToBranch", fields: [toBranchId], references: [id])
+
+  @@map("stock_transfer")
+}
+
+model Order {
+  id               BigInt      @id @default(autoincrement())
+  orderNumber      String      @unique @map("order_number")
+  userId           BigInt      @map("user_id")
+  branchId         BigInt      @map("branch_id")
+  orderDate        DateTime    @default(now()) @map("order_date")
+  status           String      // Pending, Confirmed, etc.
+  totalAmount      Decimal     @map("total_amount") @db.Decimal(10, 2)
+  deliveryDate     DateTime?   @map("delivery_date")
+  specialNotes     String?     @db.Text @map("special_notes")
+  address          String?     @db.Text
+  contactNumber    String?     @db.Text @map("contact_number")
+  driverId         BigInt?     @map("driver_id")
+  currentLocation  Json?       @map("current_location")
+  customerLocation Json?       @map("customer_location")
+  createdAt        DateTime    @default(now()) @map("created_at")
+
+  user             User        @relation(fields: [userId], references: [id])
+  branch           Branch      @relation(fields: [branchId], references: [id])
+  driver           User?       @relation("DriverOrders", fields: [driverId], references: [id])
+  items            OrderItem[]
+  deliveries       Delivery[]
+  invoices         Invoice[]
 
   @@map("orders")
 }
