@@ -278,7 +278,7 @@ export interface CreateOrderDto {
 
 export interface UpdateOrderStatusDto {
   status: string;
-  deliveryDate: Date;
+  deliveryDate?: Date;
 }
 export interface AssignDriverDto {
   driverId: bigint;

@@ -256,7 +256,6 @@ class OrderController {
 
       const updatedOrder = await orderService.updateOrderStatus(id as string, {
         status: "Cancelled",
-        deliveryDate: new Date(),
       });
       res.json({
         success: true,

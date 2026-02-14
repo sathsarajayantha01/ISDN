@@ -32,7 +32,7 @@ export function CreateTransfer() {
         setProducts(response.data || []);
       }
     } catch (error) {
-      addToast("Failed to fetch products", "error");
+      addToast("error", "Failed to fetch products");
     }
   };
 
@@ -43,7 +43,7 @@ export function CreateTransfer() {
         setBranches(response.data || []);
       }
     } catch (error) {
-      addToast("Failed to fetch branches", "error");
+      addToast("error", "Failed to fetch branches");
     }
   };
 
@@ -87,7 +87,7 @@ export function CreateTransfer() {
       });
 
       if (response.success) {
-        addToast("Stock transfer request created successfully!", "success");
+        addToast("success", "Stock transfer request created successfully!");
         setFormData({
           productId: "",
           fromBranchId: "",
@@ -97,10 +97,10 @@ export function CreateTransfer() {
         });
         setErrors({});
       } else {
-        addToast(response.message || "Failed to create transfer request", "error");
+        addToast("error", response.message || "Failed to create transfer request");
       }
     } catch (error) {
-      addToast("An error occurred while creating the transfer request", "error");
+      addToast("error", "An error occurred while creating the transfer request");
     } finally {
       setLoading(false);
     }

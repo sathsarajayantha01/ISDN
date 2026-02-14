@@ -18,10 +18,10 @@ export function TransferList() {
       if (response.success) {
         setTransfers(response.data || []);
       } else {
-        addToast(response.message || "Failed to fetch transfers", "error");
+        addToast("error", response.message || "Failed to fetch transfers");
       }
     } catch (error) {
-      addToast("An error occurred while fetching transfers", "error");
+      addToast("error", "An error occurred while fetching transfers");
     } finally {
       setLoading(false);
     }
@@ -40,13 +40,13 @@ export function TransferList() {
         {},
       );
       if (response.success) {
-        addToast("Transfer approved and completed successfully!", "success");
+        addToast("success", "Transfer approved and completed successfully!");
         fetchTransfers();
       } else {
-        addToast(response.message || "Failed to approve transfer", "error");
+        addToast("error", response.message || "Failed to approve transfer");
       }
     } catch (error) {
-      addToast("An error occurred while approving the transfer", "error");
+      addToast("error", "An error occurred while approving the transfer");
     } finally {
       setApprovingId(null);
     }
@@ -61,13 +61,13 @@ export function TransferList() {
         {},
       );
       if (response.success) {
-        addToast("Transfer rejected successfully!", "success");
+        addToast("success", "Transfer rejected successfully!");
         fetchTransfers();
       } else {
-        addToast(response.message || "Failed to reject transfer", "error");
+        addToast("error", response.message || "Failed to reject transfer");
       }
     } catch (error) {
-      addToast("An error occurred while rejecting the transfer", "error");
+      addToast("error", "An error occurred while rejecting the transfer");
     } finally {
       setApprovingId(null);
     }
