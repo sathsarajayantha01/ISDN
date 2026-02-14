@@ -200,6 +200,74 @@ class OrderController {
     }
   }
 
+  async getMyOrders(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const user = req.user as any;
+      if (!user || !user.id) {
+        res.status(401).json({ success: false, message: "Unauthorized" });
+        return;
+      }
+      const orders = await orderService.getOrdersByUserId(
+        user.id.toString(),
+      );
+      res.json({
+        success: true,
+        data: serializeBigInt(orders),
+        message: "Orders retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async cancelOrder(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = req.user as any;
+      if (!user || !user.id) {
+        res.status(401).json({ success: false, message: "Unauthorized" });
+        return;
+      }
+
+      const order = await orderService.getOrderById(id as string);
+      if (order.userId.toString() !== user.id.toString()) {
+        res.status(403).json({
+          success: false,
+          message: "You can only cancel your own orders",
+        });
+        return;
+      }
+
+      if (order.status !== "Pending") {
+        res.status(400).json({
+          success: false,
+          message: "Only pending orders can be cancelled",
+        });
+        return;
+      }
+
+      const updatedOrder = await orderService.updateOrderStatus(id as string, {
+        status: "Cancelled",
+        deliveryDate: new Date(),
+      });
+      res.json({
+        success: true,
+        data: serializeBigInt(updatedOrder),
+        message: "Order cancelled successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateOrderStatus(
     req: Request,
     res: Response,

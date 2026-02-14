@@ -10,7 +10,8 @@ class DashboardController {
   ): Promise<void> {
     try {
       const { fromDate, toDate } = req.query;
-      const branchId = req.headers["branchid"] as string | undefined;
+      const rawBranchId = req.headers["branchid"] as string | undefined;
+      const branchId = rawBranchId && rawBranchId !== "null" && rawBranchId !== "undefined" ? rawBranchId : undefined;
 
       // Validate dates if provided
       if (fromDate && isNaN(Date.parse(fromDate as string))) {
@@ -52,7 +53,8 @@ class DashboardController {
   ): Promise<void> {
     try {
       const { fromDate, toDate } = req.query;
-      const branchId = req.headers["branchid"] as string | undefined;
+      const rawBranchId = req.headers["branchid"] as string | undefined;
+      const branchId = rawBranchId && rawBranchId !== "null" && rawBranchId !== "undefined" ? rawBranchId : undefined;
       const user = (req as any).user;
 
       // Validate dates if provided
@@ -94,7 +96,8 @@ class DashboardController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const branchId = req.headers["branchid"] as string | undefined;
+      const rawBranchId = req.headers["branchid"] as string | undefined;
+      const branchId = rawBranchId && rawBranchId !== "null" && rawBranchId !== "undefined" ? rawBranchId : undefined;
 
       const products = await dashboardService.getLowStockProducts({
         branchId: branchId as string | undefined,

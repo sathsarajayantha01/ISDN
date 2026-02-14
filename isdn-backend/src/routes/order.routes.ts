@@ -23,6 +23,14 @@ router.get("/driver", authenticate, orderController.getOrdersByDriverId);
 // Get orders by status List using query param (must come before /:id)
 router.get("/status", authenticate, orderController.getOrdersByStatusList);
 
+// Get authenticated customer's own orders
+router.get(
+  "/my-orders",
+  authenticate,
+  authorize(["Retail Customer", "Business Customer"]),
+  orderController.getMyOrders,
+);
+
 // Get order by ID (generic route, must come after specific routes)
 router.get("/:id", authenticate, orderController.getOrderById);
 
@@ -32,6 +40,14 @@ router.post(
   authenticate,
   authorize(["Retail Customer", "Business Customer"]),
   orderController.createOrder,
+);
+
+// Cancel order (customer-side)
+router.put(
+  "/:id/cancel",
+  authenticate,
+  authorize(["Retail Customer", "Business Customer"]),
+  orderController.cancelOrder,
 );
 
 // Update order status

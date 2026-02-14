@@ -18,6 +18,9 @@ import {
   UserRoundPen,
   ArrowLeftRight,
   X,
+  Store,
+  ClipboardList,
+  CreditCard,
 } from "lucide-react";
 
 export function Sidebar({
@@ -72,6 +75,30 @@ export function Sidebar({
       id: "customer-products",
       label: "Customer Products",
       icon: Boxes,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "product-catalog",
+      label: "Product Catalog",
+      icon: Store,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "shopping-cart",
+      label: "Shopping Cart",
+      icon: ShoppingCart,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "checkout",
+      label: "Checkout",
+      icon: CreditCard,
+      roles: ["Business Customer", "Retail Customer"],
+    },
+    {
+      id: "my-orders",
+      label: "My Orders",
+      icon: ClipboardList,
       roles: ["Business Customer", "Retail Customer"],
     },
     {

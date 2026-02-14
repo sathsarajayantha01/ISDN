@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Login } from "./pages/Login/Login";
 import { ToastProvider, useToast } from "./context/ToastContext";
+import { CartProvider } from "./context/CartContext";
 import { branches } from "./data/mockData";
 import { apiAdapter } from "./services/apiAdapter";
 import { getRouteComponent } from "./routes";
@@ -150,7 +151,7 @@ function AppContent() {
     const PageComponent = getRouteComponent(activePage);
 
     if (PageComponent) {
-      return <PageComponent />;
+      return <PageComponent onNavigate={setActivePage} />;
     }
 
     return (
@@ -184,7 +185,9 @@ function AppContent() {
 export function App() {
   return (
     <ToastProvider>
-      <AppContent />
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
     </ToastProvider>
   );
 }
